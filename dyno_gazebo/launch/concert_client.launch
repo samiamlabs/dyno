@@ -1,0 +1,18 @@
+<launch>
+
+  <group if="$(env DYNO_PERFORMANCE)">
+    <include file="$(find dyno_gazebo)/launch/simulation.launch">
+      <arg name="headless" value="true"/>
+      <arg name="gui" value="false"/>
+    </include>
+  </group>
+
+  <group unless="$(env DYNO_PERFORMANCE)">
+    <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_navigation)/rviz/show_navigation.rviz"/>
+    <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/>
+  </group>
+
+  <include file="$(find dyno_bringup)/launch/concert_client.launch"/>
+
+</launch>

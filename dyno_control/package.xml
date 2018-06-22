@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_control</name>
+  <version>0.0.0</version>
+  <description>The dyno_control package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>dyno_description</depend>
+
+  <depend>controller_manager</depend>
+  <depend>joint_state_controller</depend>
+  <depend>position_controllers</depend>
+  <depend>velocity_controllers</depend>
+
+  <depend>mecanum_controller</depend>
+
+  <export>
+
+  </export>
+</package>

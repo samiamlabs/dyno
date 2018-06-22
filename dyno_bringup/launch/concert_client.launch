@@ -1,0 +1,150 @@
+<!--
+  Launch configuration for a gopher style concert client.
+
+  This does not provide direct access to the app manager as was done in rocon indigo.
+  What this launcher does:
+
+  - runs a gateway next to the app manager
+    - configured with flip rules for a specified concert name
+    - configured to look and flip anything in the /concert namespace
+  - runs a simple concert app manager
+    - configures the application namespace to match the gateway name
+    - pings the gateway to spin fast whenever flips are required
+
+ -->
+<launch>
+  <!-- ****************************** Robot Args ****************************** -->
+  <arg name="robot_name"        default="Ann" doc="used for rocon_uri rapp compatibility checks"/>
+  <arg name="robot_type"        default="robot_other" doc="used for rocon_uri rapp compatibility checks"/>
+  <arg name="robot_icon"        default="rocon_icons/cybernetic_pirate.png"   doc="easily identifiable icon for this robot"/>
+  <arg name="robot_description" default="To err is human, to 'arr is pirate." doc="informative doc string about this robot"/>
+
+  <!-- ****************************** Rapp Manager ****************************** -->
+  <arg name="auto_start_rapp" default="$(env DYNO_DEFAULT_RAPP)" doc="autostart a rapp, e.g. 'rocon_apps/chirp'"/>
+  <arg name="rapp_package_whitelist" default="[dyno_rapps]" doc="comma separated list of package names to restrict rapp search"/>
+  <arg name="rapp_package_blacklist" default="[]" doc="comma separated list of package names to blacklist from the rapp search"/>/>
+  <arg name="rapp_preferred_configuration_file" default="$(find dyno_bringup)/param/preferred_default.yaml" doc="pointer to a yaml file listing preferred rapps"/>
+  <arg name="screen" default="true" doc="verbose output from running apps"/>
+  <!-- See 'http://wiki.ros.org/rocon_app_manager/Tutorials/indigo/Automatic Rapp Installation'
+       on how to enable automatic rapp installation -->
+  <arg name="auto_rapp_installation" default="false" doc="hook into automatic rapp installations"/>
+
+  <group ns="rocon">
+    <node pkg="rocon_app_manager" type="concert_client.py" name="app_manager">
+      <rosparam command="load" file="$(arg rapp_preferred_configuration_file)" />
+      <rosparam param="rapp_package_whitelist" subst_value="True">$(arg rapp_package_whitelist)</rosparam>
+      <rosparam param="rapp_package_blacklist" subst_value="True">$(arg rapp_package_blacklist)</rosparam>
+      <param name="robot_name" value="$(arg robot_name)"/>
+      <param name="robot_type" value="$(arg robot_type)"/>
+      <param name="auto_start_rapp" value="$(arg auto_start_rapp)"/>
+      <param name="screen" value="$(arg screen)"/>
+      <param name="auto_rapp_installation" value="$(arg auto_rapp_installation)"/>
+      <remap from="app_manager/gateway_info" to="gateway/gateway_info"/>
+      <remap from="app_manager/flip" to="gateway/flip"/>
+      <remap from="app_manager/master_info" to="master/info"/>
+    </node>
+  </group>
+
+  <!-- ***************************** Rocon Master Info ************************** -->
+  <!--
+    Used as a convenience to advertise useful information about this platform to remote guis
+                                such as the rocon_qt_app_manager.
+  -->
+  <group ns="rocon">
+    <include file="$(find rocon_master_info)/launch/rocon_master_info.launch">
+      <arg name="name" value="$(arg robot_name)" />
+      <arg name="type" value="$(arg robot_type)" />
+      <arg name="icon" value="$(arg robot_icon)" />
+      <arg name="description" value="$(arg robot_description)" />
+    </include>
+  </group>
+
+  <!-- ******************************** Zeroconf ******************************** -->
+  <!-- Used as a helper to discover both the concert and for remote guis to find this master -->
+
+  <arg name="zeroconf"       default="true"/>
+  <arg name="zeroconf_port"  default="11311"/>
+
+  <group if="$(arg zeroconf)" ns="rocon">
+    <include file="$(find rocon_app_manager)/launch/includes/_zeroconf.xml">
+      <arg name="name" value="$(arg robot_name)"/>
+      <arg name="port" value="$(arg zeroconf_port)"/>
+    </include>
+  </group>
+
+  <!-- ******************************** Gateway ******************************** -->
+  <arg name="gateway_uuids"                   default="false" doc="all gateways represent their robots with unique uuid's postfixed to the name" />
+  <arg name="gateway_watch_loop_period"       default="10"    doc="the polling period for multimaster advertising/flipping" />
+  <arg name="hub_whitelist"                   default="[]"    doc="list of hub names/regex patterns to use if zeroconf is enabled"/>
+  <arg name="hub_uri"                         default="$(env DYNO_HUB_URI)"      doc="where the gateway can find a hub if zeroconf is disabled"/>
+  <arg name="gateway_custom_rules_file"       default=""      doc="name of a user custom parameterisation (yaml)."/>
+  <arg name="connection_cache"                default="true"  doc="whether to launch the connection cache node to cache the master state"/>
+  <arg name="connection_cache_spin_frequency" default="0.1"   doc="how fast to cache the master state (note you can 'spin it up' via service calls)"/>
+
+  <group ns="rocon">
+    <group if="$(arg connection_cache)">
+      <!-- ROS improvements -->
+      <include file="$(find rocon_python_comms)/launch/connection_cache.launch">
+          <arg name="spin_freq" value="$(arg connection_cache_spin_frequency)"/>
+      </include>
+    </group>
+
+    <node pkg="rocon_gateway" type="gateway.py" name="gateway">
+      <rosparam command="load" file="$(find rocon_gateway)/param/default.yaml" />
+      <rosparam command="load" file="$(find rocon_gateway)/param/default_blacklist.yaml" />
+      <rosparam command="load" file="$(find rocon_app_manager)/param/advertisements.yaml" />
+      <rosparam param="hub_whitelist" subst_value="True">$(arg hub_whitelist)</rosparam>
+      <param name="hub_uri" value="$(arg hub_uri)"/>
+      <param name="firewall" value="true"/>  <!-- nothing allowed in! -->
+      <param name="name" value="$(arg robot_name)"/>
+      <param name="watch_loop_period" value="$(arg gateway_watch_loop_period)"/>
+      <param name="disable_uuids" value="false" if="$(arg gateway_uuids)"/>
+      <param name="disable_uuids" value="true" unless="$(arg gateway_uuids)"/>
+      <param name="disable_zeroconf" value="false" if="$(arg zeroconf)"/>
+      <param name="disable_zeroconf" value="true" unless="$(arg zeroconf)"/>
+      <param name="custom_rules_file" value="$(arg gateway_custom_rules_file)"/>
+    </node>
+  </group>
+
+  <!-- ****************************** Capabilities ****************************** -->
+  <!-- Optionally load up a capability server underneath the rapp manager (default: no) -->
+
+  <arg name="capabilities"                       default="true" doc="enable/disable a capability server" />
+  <arg name="capabilities_parameters"            default="$(find dyno_bringup)/param/capability_providers.yaml" doc="detailed parameter configuration for the providers" />
+  <arg name="capabilities_blacklist"             default="[]" doc="blacklist specific capabilities" />
+  <arg name="capabilities_nodelet_manager_name"  default="capability_server_nodelet_manager" />
+  <arg name="capabilities_package_whitelist"     default="[dyno_capabilities]" doc="get capabilities from these packages only" />
+  <arg name="capabilities_server_name"           default="capability_server"/>
+
+  <group if="$(arg capabilities)">
+    <include file="$(find rocon_app_manager)/launch/includes/_capabilities.xml">
+      <arg name="blacklist"            value="$(arg capabilities_blacklist)" />
+      <arg name="nodelet_manager_name" value="$(arg capabilities_nodelet_manager_name)" />
+      <arg name="name"                 value="$(arg capabilities_server_name)" />
+      <arg name="package_whitelist"    value="$(arg capabilities_package_whitelist)" />
+      <arg name="parameters"           value="$(arg capabilities_parameters)" />
+    </include>
+  </group>
+
+  <!-- ***************************** Interactions ******************************* -->
+  <!-- Optionally load up interactions next to the rapp manager (default: no) -->
+  <arg name="interactions"         default="false" doc="enable/disable interactions"/>
+  <arg name="interactions_list"    default="[]"    doc="comma separated list of package resource names pointing to yaml interaction configurations (doesn't need the .interactions extension), e.g. [rocon_interactions/pairing]"/>
+  <arg name="rosbridge_address"    default="localhost"/>
+  <arg name="rosbridge_port"       default="9090"/>
+  <arg name="webserver_address"    default="webapp.robotconcert.org"/>
+  <arg name="auto_start_pairing"   default="" doc="auto start a pre-configured rapp for interactions, e.g. 'Talker'"/>
+
+  <group if="$(arg interactions)" ns="rocon">
+    <include file="$(find rocon_app_manager)/launch/includes/_interactions.xml">
+      <arg name="interactions_list"  value="$(arg interactions_list)"/>
+      <arg name="auto_start_pairing" value="$(arg auto_start_pairing)"/>
+      <arg name="rosbridge_address"  value="$(arg rosbridge_address)"/>
+      <arg name="rosbridge_port"     value="$(arg rosbridge_port)"/>
+      <arg name="webserver_address"  value="$(arg webserver_address)"/>
+    </include>
+  </group>
+
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+</launch>

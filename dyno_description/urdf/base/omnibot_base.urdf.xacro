@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- Guidebot differential mecanum base -->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="omnibot_base.gazebo.xacro"/>
+
+  <xacro:include filename="../wheels/omnibot/mecanum_wheel.urdf.xacro"/>
+
+  <!-- Base footprint offset -->
+  <xacro:property name="base_footprint_height_offset" value="0.05"/> <!-- old value 0.19 -->
+
+  <!-- Base -->
+  <xacro:macro name="base">
+    <!-- Base -->
+
+    <link name="base_link">
+
+      <visual>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/omnibot_base.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="blue"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0.04" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.4 0.4 0.15"/>
+        </geometry>
+        <material name="orange"/>
+      </collision>
+
+      <!-- TODO: update according to real base properties -->
+      <inertial>
+        <mass value="10.0" />
+        <origin xyz="0 0 0" />
+        <cylinder_inertia m="10.0" r="0.3" h="0.2" />
+      </inertial>
+
+    </link>
+
+    <!-- Base footprint -->
+    <link name="base_footprint">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="0.01" radius="0.3"/>
+        </geometry>
+        <material name="orange"/>
+      </collision>
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <origin xyz="0 0 ${base_footprint_height_offset}" rpy="0 0 0"/>
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+    </joint>
+
+    <!-- Macros -->
+    <xacro:property name="wheel_separation" value="0.33"/>
+    <xacro:property name="wheel_torque"     value="6.0"/>
+    <xacro:property name="wheel_velocity"   value="1.0"/>
+
+    <mecanum_wheel name="wheel_front_right"  separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="1.0" parent="base_link"/>
+    <mecanum_wheel name="wheel_front_left"   separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="-1.0" parent="base_link"/>
+    <mecanum_wheel name="wheel_rear_right"   separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="1.0" parent="base_link"/>
+    <mecanum_wheel name="wheel_rear_left"    separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="-1.0" parent="base_link"/>
+
+    <!-- Gazebo extentions -->
+    <base_gazebo/>
+
+  </xacro:macro>
+
+</robot>

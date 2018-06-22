@@ -1,0 +1,163 @@
+#!/usr/bin/env python
+
+from __future__ import division
+from __future__ import unicode_literals
+
+import roslib
+import rospy
+import diagnostic_updater
+import diagnostic_msgs
+import std_msgs
+import random
+
+from std_srvs.srv import Empty, EmptyResponse
+
+time_to_launch = 8
+
+
+class Device:
+    def __init__(self, deviceId='Unknown', topic_name='unknown'):
+        self.topic_name = topic_name
+        self.deviceId = deviceId
+
+        self.node_name = deviceId + '_driver'
+
+        self.updater = diagnostic_updater.Updater(self.node_name.lower())
+        self.updater.setHardwareID(self.deviceId)
+
+        frequency_param = '~' + topic_name + '_frequency'
+        self.topic_frequency = rospy.get_param(frequency_param, 10)
+        connected_param = '~' + deviceId + '_connected'
+        self.connected = rospy.get_param(connected_param, True)
+
+        self.frequency_bounds = {'min': self.topic_frequency,
+                                 'max': self.topic_frequency}
+
+        self.topic_diagnostic = diagnostic_updater.HeaderlessTopicDiagnostic(
+            self.topic_name, self.updater,
+            diagnostic_updater.FrequencyStatusParam(self.frequency_bounds,
+                                                    0.1, 15))
+
+        self._connection_start_time = rospy.get_rostime()
+
+        self.last_scan_update = rospy.get_rostime()
+        self.update_duration = rospy.Duration(
+            1 / self.topic_frequency)
+
+        self.updater.add(self.deviceId + ' Connection', self.check_connection)
+
+        self.unstable = False
+        self.unstable_last_change = rospy.get_time()
+        self.unstable_change_timer = 1
+        self.unstable_status = 0
+
+    def set_connection(self, connected):
+        if(connected and not self.connected):
+            self._connection_start_time = rospy.get_rostime()
+        self.connected = connected
+
+    def check_connection(self, stat):
+        if self.unstable:
+            delta_time = rospy.get_time() - self.unstable_last_change
+            if delta_time > self.unstable_change_timer:
+                self.unstable_status = random.randint(0, 3)
+
+            stat.summary(self.unstable_status,
+                         "Unstable connection")
+            return stat
+
+        if self.connected:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK,
+                         "Connection ok")
+            up_time = rospy.get_time() - self._connection_start_time.to_sec()
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
+                         "Disconnected")
+            up_time = 0
+
+        stat.add("Up Time", up_time)
+        return stat
+
+    def update(self):
+        self.topic_diagnostic.tick()
+        if(rospy.get_rostime() - self.last_scan_update > self.update_duration):
+            self.updater.update()
+            self.last_scan_update = rospy.get_rostime()
+
+
+class Battery:
+    def __init__(self):
+        self.updater = diagnostic_updater.Updater("battery_driver")
+        self.updater.setHardwareID("Battery")
+
+        self.level = 0.9
+        self.updater.add('Battery level', self.check_level)
+
+        self.battery_level_timer = 0.1
+        self.last_battery_update = rospy.get_time()
+
+    def check_level(self, stat):
+        if self.level == 0:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
+                         "Battery is out of power")
+        if self.level < 0.1:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN,
+                         "Battery level low")
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK,
+                         "Battery level ok")
+
+        stat.add("Level", self.level)
+        return stat
+
+    def update(self):
+        if self.level > 0.01:
+            delta_time = rospy.get_time() - self.last_battery_update
+            if delta_time > self.battery_level_timer:
+                self.level -= 0.005
+                self.last_battery_update = rospy.get_time()
+        else:
+            self.level = 1.0
+
+        self.updater.update()
+
+
+class FakeDiagnostics():
+    def __init__(self):
+        rospy.init_node("fake_diagnostics")
+
+        self.devices = {}
+        self.devices['SweepLidar'] = Device('SweepLidar', 'scan')
+        self.devices['Imu'] = Device('Imu', 'imu')
+        self.devices['LeftWheel'] = Device('LeftWheel', 'left_wheel_status')
+        self.devices['RightWheel'] = Device('RightWheel', 'left_wheel_status')
+
+        self.battery = Battery()
+
+        max_frequency = 0
+
+        set_unstable_service = rospy.Service(
+            '~set_unstable', Empty, self.handle_set_unstable)
+
+        for key in self.devices:
+            max_frequency = max(max_frequency,
+                                self.devices[key].topic_frequency)
+
+        last_scan_update = rospy.get_rostime()
+
+        while not rospy.is_shutdown():
+            rospy.sleep(1 / max_frequency)
+
+            self.battery.update()
+
+            for key in self.devices:
+                self.devices[key].update()
+
+    def handle_set_unstable(self, request):
+        self.devices['SweepLidar'].unstable = True
+        self.devices['LeftWheel'].unstable = True
+        return EmptyResponse()
+
+
+if __name__ == '__main__':
+    fakeDiagnostics = FakeDiagnostics()

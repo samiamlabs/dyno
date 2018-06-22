@@ -1,0 +1,31 @@
+<launch>
+  <node name="fake_diagnostics" pkg="guidebot_gazebo" type="fake_diagnostics">
+    <rosparam>
+      diagnostic_period: 1
+      scan_frequency: 10
+    </rosparam>
+  </node>
+
+  <!--
+  <test test-name="diagnostics_topic_hz" pkg="rostest" type="hztest" name="hztest1">
+    <rosparam>
+      topic: /diagnostics
+      hz: 1.0
+      hzerror: 0.5
+      test_duration: 3.0
+      wait_time: 21.0
+    </rosparam>
+  </test>
+  -->
+
+  <test test-name="fake_diagnostics_test" pkg="guidebot_gazebo" type="fake_diagnostics_test.py">
+    <rosparam>
+      test_duration: 3
+    </rosparam>
+  </test>
+
+  <!--
+    <test test-name="example" pkg="guidebot_gazebo" type="example.py" />
+    <test test-name="example2" pkg="guidebot_gazebo" type="example2.py" />
+  -->
+</launch>

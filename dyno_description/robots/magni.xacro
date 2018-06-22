@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno" >
+
+  <xacro:include filename="../urdf/materials/materials.xacro"/>
+  <xacro:include filename="../urdf/plugins.gazebo.xacro"/>
+
+  <!-- Set up definitions of parts of robot body -->
+  <xacro:include filename="../urdf/base/magni_base.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/leddarvu.urdf.xacro"/>
+
+  <!--
+  <xacro:include filename="../urdf/sensors/sweep.urdf.xacro"/>
+  -->
+
+  <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
+
+  <!-- Use macros to define the actual robot -->
+  <base/>
+
+
+  <!--
+  <sweep name="sweep" ros_topic="scan" min_angle="${-pi}" max_angle="${pi}"/>
+  <joint name="leddarvu_mount_joint" type="fixed">
+    <origin xyz="0 0 0.142" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="leddarvu_mount_link"/>
+  </joint>
+  -->
+
+  <imu/>
+
+
+</robot>

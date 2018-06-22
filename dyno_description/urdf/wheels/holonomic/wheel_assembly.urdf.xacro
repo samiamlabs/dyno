@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!-- Guidebot differential drive base -->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="wheel_assembly.gazebo.xacro"/>
+
+  <!-- Constants -->
+  <xacro:property name="M_PI" value="3.1415926535897931"/>
+  <xacro:property name="mx160_effort" value="8.3"/>
+  <!-- 8.3 N/m ?? 45rpm -> 4.71 rad/s-->
+  <xacro:property name="mx160_velocity" value="4.71"/>
+
+  <!-- Inertia -->
+  <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertia ixx="${m*(3*r*r+h*h)/12}" ixy="0" ixz="0" iyy="${m*(3*r*r+h*h)/12}" iyz="0" izz="${m*r*r/2}"/>
+  </xacro:macro>
+
+  <xacro:macro name="box_inertia" params="m x y z">
+    <inertia ixx="${m*(y*y+z*z)/12}" ixy="0" ixz="0" iyy="${m*(z*z+x*x)/12}" iyz="0" izz="${m*(x*x+y*y)/12}"/>
+  </xacro:macro>
+
+  <!-- Tire characteristics -->
+  <xacro:property name="wheel_radius" value="0.05"/>
+  <xacro:property name="wheel_width" value="0.02"/>
+
+  <!-- Caster characteristics -->
+  <xacro:property name="caster_offset_x" value="0.15"/>
+  <xacro:property name="caster_offset_y" value="0.15"/>
+  <xacro:property name="caster_offset_z" value="0.14"/>
+
+  <!-- Wheel Tire-->
+  <xacro:macro name="wheel_tire" params="parent suffix offset">
+    <joint name="${parent}_wheel_tire_${suffix}" type="fixed">
+      <origin xyz="0 0 ${offset}" rpy="0 0 0"/>
+      <parent link="${parent}_wheel_link"/>
+      <child link="${parent}_wheel_tire_${suffix}_link"/>
+    </joint>
+
+    <link name="${parent}_wheel_tire_${suffix}_link">
+      <inertial>
+        <mass value="1.0"/>
+        <origin xyz="0 0 0"/>
+        <cylinder_inertia m="1.0" r="${wheel_radius}" h="${wheel_width}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="DarkGrey"/>
+      </visual>
+      <collision>
+
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+
+      </collision>
+    </link>
+
+    <xacro:gazebo_tire_link name="${parent}_wheel_tire_${suffix}_link" color="Black"/>
+
+  </xacro:macro>
+
+  <!-- Wheel Shaft -->
+  <xacro:macro name="wheel_schaft" params="suffix rot_axis">
+
+    <joint name="${suffix}_wheel_joint" type="continuous">
+      <axis xyz="0 0 ${rot_axis}"/>
+      <limit effort="${mx160_effort*500}" velocity="${mx160_velocity*100}"/>
+      <dynamics damping="0.0" friction="0.0"/>
+      <origin xyz="0 0 -${caster_offset_z}" rpy="-${M_PI/2} 0 0"/>
+      <parent link="${suffix}_steer_link"/>
+      <child link="${suffix}_wheel_link"/>
+    </joint>
+
+    <xacro:simple_transmission name="${suffix}_wheel_joint" interface="VelocityJointInterface"/>
+
+    <link name="${suffix}_wheel_link">
+      <inertial>
+        <mass value="5.0"/>
+        <origin xyz="0 0 0"/>
+        <cylinder_inertia m="5.0" r="0.02" h="0.100"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <cylinder length="0.095" radius="0.02"/>
+        </geometry>
+        <material name="Grey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${0.100 - wheel_width*2 - 0.01}" radius="0.02"/>
+          <!-- avoid collision to tire -->
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:gazebo_tire_link name="${suffix}_wheel_link" color="Grey"/>
+
+  </xacro:macro>
+
+  <!-- Wheel Steer -->
+  <xacro:macro name="wheel_steer" params="suffix">
+    <joint name="${suffix}_steer_joint" type="revolute">
+      <axis xyz="0 0 -1"/>
+      <limit lower="${-90*M_PI/180.0}" upper="${90*M_PI/180.0}" effort="${mx160_effort}" velocity="${mx160_velocity}"/>
+      <dynamics damping="0.0" friction="0.0"/>
+      <xacro:insert_block name="origin"/>
+      <parent link="base_link"/>
+      <child link="${suffix}_steer_link"/>
+    </joint>
+
+    <xacro:simple_transmission name="${suffix}_steer_joint" interface="PositionJointInterface"/>
+
+    <link name="${suffix}_steer_link">
+      <inertial>
+        <mass value="1.0"/>
+        <origin xyz="0 0 -${caster_offset_z/2}" rpy="0 0 0"/>
+        <cylinder_inertia m="1.0" r="0.015" h="${caster_offset_z}"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 -${caster_offset_z/2}" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${caster_offset_z}" radius="0.015"/>
+        </geometry>
+        <material name="LightGrey"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -${caster_offset_z/2}" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${caster_offset_z-0.05}" radius="0.015"/>
+          <!-- avoid collision for wheel_schaft radius(0.02) -->
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:gazebo_steer_link name="${suffix}_steer_link" color="White"/>
+
+  </xacro:macro>
+
+  <!-- Wheel Assembly -->
+  <xacro:macro name="wheel_assembly" params="suffix *origin rot_axis">
+
+    <xacro:wheel_steer suffix="${suffix}"/>
+    <xacro:wheel_schaft suffix="${suffix}" rot_axis="${rot_axis}"/>
+    <xacro:wheel_tire parent="${suffix}" suffix="l" offset="${0.05-wheel_width/2}"/>
+    <xacro:wheel_tire parent="${suffix}" suffix="r" offset="-${0.05-wheel_width/2}"/>
+
+  </xacro:macro>
+
+</robot>
