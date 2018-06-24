@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+import roslib
+import rospy
+
+from sensor_msgs.msg import Joy
+from geometry_msgs.msg import Twist
+
+
+class JoystickTeleop():
+    def __init__(self):
+        rospy.init_node('joystick_teleop')
+
+        self._twist = Twist()
+        self._enable_button = 0
+        self._last_enable_button = False
+
+        rospy.Subscriber('/joy', Joy, self.joy_cb)
+        self._cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+
+        rate = rospy.Rate(10) # 10hz
+        while not rospy.is_shutdown():
+            if(self._enable_button):
+                self._cmd_vel_pub.publish(self._twist)
+            else:
+                self._cmd_vel_pub.publish(Twist())
+            rate.sleep()
+
+    def joy_cb(self, msg):
+        x_axis = msg.axes[1]
+        y_axis = msg.axes[0]
+        z_axis = msg.axes[2]
+
+        rospy.logdebug("x: %f, y: %f, z: %f", x_axis, y_axis, z_axis)
+
+        self._twist = Twist()
+        self._twist.linear.x = x_axis * 2
+        self._twist.linear.y = y_axis * 2
+        self._twist.angular.z = z_axis * 4
+
+        self._enable_button = msg.buttons[4] == 1
+        self._last_enable_button = self._enable_button
+
+if __name__ == '__main__':
+    JoystickTeleop()

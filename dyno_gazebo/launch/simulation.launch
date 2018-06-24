@@ -24,6 +24,6 @@
   <param name="robot_description" command="$(find xacro)/xacro '$(find dyno_description)/robots/$(arg base).xacro'"/>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model dyno -param robot_description -x -1.3 -y 0.2 -Y 3.1492"/>
+<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model dyno -param robot_description -x 0.0 -y 0.0 -Y 0.0"/>
 
 </launch>

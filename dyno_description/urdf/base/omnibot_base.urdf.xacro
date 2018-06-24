@@ -25,9 +25,9 @@
       </visual>
 
       <collision>
-        <origin xyz="0 0 0.04" rpy="0 0 0"/>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
         <geometry>
-          <box size="0.4 0.4 0.15"/>
+          <box size="0.42 0.4 0.10"/>
         </geometry>
         <material name="orange"/>
       </collision>
@@ -63,10 +63,10 @@
     <xacro:property name="wheel_torque"     value="6.0"/>
     <xacro:property name="wheel_velocity"   value="1.0"/>
 
-    <mecanum_wheel name="wheel_front_right"  separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="1.0" parent="base_link"/>
-    <mecanum_wheel name="wheel_front_left"   separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="-1.0" parent="base_link"/>
-    <mecanum_wheel name="wheel_rear_right"   separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="1.0" parent="base_link"/>
-    <mecanum_wheel name="wheel_rear_left"    separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="-1.0" parent="base_link"/>
+    <mecanum_wheel name="wheel_front_right"  separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="1.0" type="right" parent="base_link"/>
+    <mecanum_wheel name="wheel_front_left"   separation="${wheel_separation}" x_offset="${wheel_separation/2}" reflect="-1.0" type="left" parent="base_link"/>
+    <mecanum_wheel name="wheel_rear_right"   separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="1.0" type="left" parent="base_link"/>
+    <mecanum_wheel name="wheel_rear_left"    separation="${wheel_separation}" x_offset="${-wheel_separation/2}" reflect="-1.0" type="right" parent="base_link"/>
 
     <!-- Gazebo extentions -->
     <base_gazebo/>

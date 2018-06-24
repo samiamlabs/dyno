@@ -16,11 +16,11 @@
   <gazebo>
 
     <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>/odom</odometryTopic>
+      <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+      <odometryTopic>/ground_truth_odom</odometryTopic>
       <odometryFrame>odom</odometryFrame>
       <odometryRate>20.0</odometryRate>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <robotBaseFrame>ground_truth_frame</robotBaseFrame>
     </plugin>
 
 <!--

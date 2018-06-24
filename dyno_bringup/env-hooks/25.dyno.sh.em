@@ -16,7 +16,7 @@
 
 : ${DYNO_NAME:=Ann}
 : ${DYNO_SIMULATION:=true}
-: ${DYNO_BASE:=magni}
+: ${DYNO_BASE:=omnibot}
 : ${DYNO_RAPP_PACKAGE_WHITELIST:=[rocon_apps, dyno_rapps]}
 : ${DYNO_RAPP_PACKAGE_BLACKLIST:=[]}
 : ${DYNO_INTERACTIONS_LIST:=[dyno_interactions/web, dyno_interactions/pairing]}

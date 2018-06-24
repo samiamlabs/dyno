@@ -1,3 +1,37 @@
 mobile_base_controller:
   type        : "mecanum_controller/MecanumController"
   publish_rate: 50.0
+
+  front_wheel: ['wheel_front_left_joint', 'wheel_front_right_joint']
+  rear_wheel: ['wheel_rear_left_joint', 'wheel_rear_right_joint']
+
+  pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
+  twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
+
+  open_loop: false
+
+  # Velocity and acceleration limits
+  # Whenever a min_* is unspecified, default to -max_*
+  linear:
+    x:
+      has_velocity_limits    : true
+      max_velocity           :  2.0 # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 20.0 # m/s^2
+      has_jerk_limits        : false
+      max_jerk               : 50.0 # m/s^3
+    y:
+      has_velocity_limits    : true
+      max_velocity           :  2.0 # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 20.0 # m/s^2
+      has_jerk_limits        : false
+      max_jerk               : 50.0 # m/s^3
+  angular:
+    z:
+      has_velocity_limits    : true
+      max_velocity           : !degrees 120.0
+      has_acceleration_limits: false
+      max_acceleration       : !degrees 120.0
+      has_jerk_limits        : false
+      max_jerk               : !degrees 600.0
