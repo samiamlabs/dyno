@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_navigation</name>
+  <version>0.0.1</version>
+  <description>The dyno_navigation package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>tf</depend>
+  <depend>roscpp</depend>
+
+  <depend>cartographer_ros</depend>
+
+  <depend>move_base</depend>
+  <depend>twist_mux</depend>
+
+  <depend>base_local_planner</depend>
+  <depend>eband_local_planner</depend>
+  <depend>teb_local_planner</depend>
+  <depend>dwa_local_planner</depend>
+
+  <depend>global_planner</depend>
+
+  <export>
+  </export>
+</package>

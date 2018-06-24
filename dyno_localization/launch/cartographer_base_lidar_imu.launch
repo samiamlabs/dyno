@@ -1,0 +1,12 @@
+<launch>
+  
+  <node name="flat_world_imu_node" pkg="cartographer_turtlebot" type="cartographer_flat_world_imu_node" output="screen">
+    <remap from="imu_in" to="/hsrb/base_imu/data"/>
+    <remap from="imu_out" to="/imu"/>
+  </node>
+
+  <include file="$(find dyno_hsr_localization)/launch/cartographer.launch.xml">
+    <arg name="configuration_basename" value="cartographer_base_lidar_imu.lua" />
+  </include>
+
+</launch>

@@ -1,0 +1,7 @@
+<launch>
+
+  <include file="$(find dyno_localization)/launch/cartographer.launch.xml">
+    <arg name="configuration_basename" value="cartographer_base_lidar.lua" />
+  </include>
+
+</launch>

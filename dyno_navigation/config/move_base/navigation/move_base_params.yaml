@@ -1,0 +1,61 @@
+# Move base node parameters. For full documentation of the parameters in this file, please see
+#
+#  http://www.ros.org/wiki/move_base
+#
+shutdown_costmaps: false
+
+controller_frequency: 5.0
+controller_patience: 3.0
+
+
+planner_frequency: 1.0
+planner_patience: 5.0
+
+oscillation_timeout: 10.0
+oscillation_distance: 0.2
+
+# local planner - default is tjrajectory rollout
+base_local_planner: "eband_local_planner/EBandPlannerROS" #alternatives "dwa_local_planner/DWAPlannerROS" base_local_planner/TrajectoryPlannerROS eband_local_planner/EBandPlannerROS ftc_local_planner/FTCPlanner teb_local_planner/TebLocalPlannerROS
+
+base_global_planner: "global_planner/GlobalPlanner" #alternatives: navfn/NavfnROS, global_planner/GlobalPlanner, carrot_planner/CarrotPlanner guidebot_navigation/LinefollowPlanner
+
+clearing_rotation_allowed: false
+
+EBandPlannerROS:
+   xy_goal_tolerance: 0.03
+   yaw_goal_tolerance: 0.05
+
+   max_vel_lin: 1.0
+   max_vel_th: 2.0
+
+   max_acceleration: 1.0
+   max_translational_acceleration: 1.0
+   max_rotational_acceleration: 1.2
+
+   differential_drive: false
+
+   # rot_stopped_vel: 0.01
+   # trans_stopped_vel: 0.01
+   # marker_lifetime: 0.5
+   # eband_min_relative_overlap: 0.7
+   # eband_tiny_bubble_distance: 0.01
+   # eband_tiny_bubble_expansion: 0.01
+   # eband_internal_force_gain: 1.0
+   # eband_external_force_gain: 2.0
+   # num_iterations_eband_optimization: 3
+   # eband_equilibrium_approx_max_recursion_depth: 4
+   # eband_equilibrium_relative_overshoot: 0.75
+   # eband_significant_force_lower_bound: 0.15
+   # costmap_weight: 10.0
+   # min_vel_lin: 0.1
+   # min_vel_th: 0.0
+   # min_in_place_vel_th: 0.2
+   # in_place_trans_vel: 0.0
+   # k_prop: 4.0
+   # k_damp: 3.5
+   # Ctrl_Rate: 10.0
+   # virtual_mass: 0.75
+   # rotation_correction_threshold: 0.5
+   # bubble_velocity_multiplier: 2.0
+   # rotation_threshold_multiplier: 1.0
+   # disallow_hysteresis: false
