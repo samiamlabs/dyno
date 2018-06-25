@@ -1,0 +1,7 @@
+<launch>
+  <arg name="type"/>
+  <node name="joy_node" pkg="joy" type="joy_node"/>
+  <node name="joy_teleop" pkg="dyno_teleop" type="joy_teleop">
+      <param name="type" value="$(arg type)"/>
+  </node>
+</launch>

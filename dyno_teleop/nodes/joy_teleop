@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+import roslib
+import rospy
+
+from sensor_msgs.msg import Joy
+from geometry_msgs.msg import Twist
+
+class JoystickTeleop():
+    def __init__(self):
+        rospy.init_node('joystick_teleop')
+
+        if rospy.has_param("~type"):
+            self._type = rospy.get_param("~type")
+        else:
+            rospy.logerr("Param for joystick 'type' not set!")
+            exit()
+
+        self._max_linear = 2.0 # m/s
+        self._max_angular = 4.0 # rad/s
+
+        self._twist = Twist()
+        self._dead_mans_switch = False
+
+        rospy.Subscriber('/joy', Joy, self.joy_cb)
+        self._cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+
+        rate = rospy.Rate(10) # 10hz
+        while not rospy.is_shutdown():
+            if(self._dead_mans_switch):
+                self._cmd_vel_pub.publish(self._twist)
+            else:
+                self._cmd_vel_pub.publish(Twist())
+            rate.sleep()
+
+    def joy_cb(self, msg):
+        self._twist = Twist()
+
+        if self._type == "ps4":
+            self._twist.linear.x = msg.axes[1]
+            self._twist.linear.y = msg.axes[0]
+            self._twist.angular.z = msg.axes[2]
+            self._dead_mans_switch = msg.buttons[4] == 1
+        elif self._type == "xbox360":
+            self._twist.linear.x = msg.axes[1]
+            self._twist.linear.y = msg.axes[0]
+            self._twist.angular.z = msg.axes[3]
+            self._dead_mans_switch = msg.buttons[4] == 1
+        else:
+            rospy.logerr("Joystick type '%s' is not supported!", self._type)
+
+        self._twist.linear.x *= self._max_linear
+        self._twist.linear.y *= self._max_linear
+        self._twist.angular.z *= self._max_angular
+
+        rospy.logdebug("x: %f, y: %f, z: %f, d: %d",
+            self._twist.linear.x,
+            self._twist.linear.y,
+            self._twist.angular.z,
+            self._dead_mans_switch
+            )
+
+if __name__ == '__main__':
+    JoystickTeleop()
