@@ -1,0 +1,8 @@
+<launch>
+	<arg name="sigverse_ros_bridge_port"        default="50001" />
+
+	<group ns="sigverse_ros_bridge">
+		<node name="sigverse_ros_bridge" pkg="sigverse_ros_bridge" type="sigverse_ros_bridge" args="$(arg sigverse_ros_bridge_port)"/>
+	</group>
+
+</launch>

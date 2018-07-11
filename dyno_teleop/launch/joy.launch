@@ -1,5 +1,5 @@
 <launch>
-  <arg name="type"/>
+  <arg name="type" default="gamepad"/>
   <node name="joy_node" pkg="joy" type="joy_node"/>
   <node name="joy_teleop" pkg="dyno_teleop" type="joy_teleop">
       <param name="type" value="$(arg type)"/>

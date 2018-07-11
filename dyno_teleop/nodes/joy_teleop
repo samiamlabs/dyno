@@ -21,15 +21,20 @@ class JoystickTeleop():
         self._twist = Twist()
         self._dead_mans_switch = False
 
+        self._last_dead_mans_down = rospy.get_rostime()
+
         rospy.Subscriber('/joy', Joy, self.joy_cb)
         self._cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+
 
         rate = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
             if(self._dead_mans_switch):
                 self._cmd_vel_pub.publish(self._twist)
-            else:
+
+            if rospy.get_rostime() > self._last_dead_mans_down + rospy.Duration.from_sec(0.2):
                 self._cmd_vel_pub.publish(Twist())
+
             rate.sleep()
 
     def joy_cb(self, msg):
@@ -45,12 +50,20 @@ class JoystickTeleop():
             self._twist.linear.y = msg.axes[0]
             self._twist.angular.z = msg.axes[3]
             self._dead_mans_switch = msg.buttons[4] == 1
+        elif self._type == "gamepad":
+            self._twist.linear.x = msg.axes[0]
+            self._twist.linear.y = 0.0
+            self._twist.angular.z = -msg.axes[1]
+            self._dead_mans_switch = msg.buttons[3] == 1
         else:
             rospy.logerr("Joystick type '%s' is not supported!", self._type)
 
         self._twist.linear.x *= self._max_linear
         self._twist.linear.y *= self._max_linear
         self._twist.angular.z *= self._max_angular
+
+        if self._dead_mans_switch:
+            self._last_dead_mans_down = rospy.get_rostime()
 
         rospy.logdebug("x: %f, y: %f, z: %f, d: %d",
             self._twist.linear.x,

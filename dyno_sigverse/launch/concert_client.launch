@@ -1,0 +1,31 @@
+<launch>
+	<arg name="sub_msg_to_robot_topic_name"       default="/handyman/message/to_robot" />
+	<arg name="pub_msg_to_moderator_topic_name"   default="/handyman/message/to_moderator" />
+	<arg name="sub_joint_state_topic_name"        default="/hsrb/joint_states" />
+	<arg name="pub_base_twist_topic_name"         default="/hsrb/opt_command_velocity" />
+	<arg name="pub_arm_trajectory_topic_name"     default="/hsrb/arm_trajectory_controller/command" />
+	<arg name="pub_gripper_trajectory_topic_name" default="/hsrb/gripper_trajectory_controller/command" />
+
+	<arg name="sigverse_ros_bridge_port"        default="50001" />
+
+	<group ns="sigverse_ros_bridge">
+		<node name="sigverse_ros_bridge" pkg="sigverse_ros_bridge" type="sigverse_ros_bridge" args="$(arg sigverse_ros_bridge_port)"/>
+	</group>
+
+  <group if="$(env DYNO_PERFORMANCE)">
+  </group>
+
+  <group unless="$(env DYNO_PERFORMANCE)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_navigation)/rviz/show_navigation.rviz"/>
+    <node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/>
+  </group>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <include file="$(find hsr_description)/robots/upload_hsrb.launch">
+    <arg name="implicit_damping" value="true"/>
+    <arg name="visualization" value="false"/>
+  </include>
+
+  <include file="$(find dyno_bringup)/launch/concert_client.launch"/>
+
+</launch>

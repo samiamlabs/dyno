@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_sigverse</name>
+  <version>0.0.0</version>
+  <description>The dyno_sigverse package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>hsr_description</depend>
+
+  <depend>rostest</depend>
+  <depend>rosunit</depend>
+
+  <depend>sigverse_ros_package</depend>
+
+  <export>
+
+  </export>
+</package>
