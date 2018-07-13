@@ -6,7 +6,6 @@
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
-  <arg name="base" default="$(env DYNO_BASE)"/>
 
   <env name="GAZEBO_MODEL_PATH" value="$(find dyno_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)"/>
 
@@ -20,10 +19,9 @@
     <arg name="headless" value="$(arg headless)"/>
   </include>
 
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find dyno_description)/robots/$(arg base).xacro'"/>
+  <include file="$(find dyno_description)/launch/load_robot_description.launch"/>
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model dyno -param robot_description -x 0.0 -y 0.0 -Y 0.0"/>
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model dyno -param robot_description -x 0.0 -y 0.0 -Y 0.0"/>
 
 </launch>

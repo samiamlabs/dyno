@@ -7,7 +7,7 @@
     <scanse_sweep name="${name}" ros_topic="${ros_topic}"
       length="0.065" width="0.065" height="0.0619" mass="0.120" z_offset="0.0415"
       min_range="${0.05}" max_range="${15.0}"
-      mesh="package://guidebot_description/meshes/sweep.dae" />
+      mesh="package://dyno_description/meshes/sensors/sweep.dae" />
   </xacro:macro>
 
   <xacro:macro name="scanse_sweep" params="name ros_topic length width height mass z_offset min_range max_range mesh">

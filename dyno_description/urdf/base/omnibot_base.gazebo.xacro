@@ -11,28 +11,38 @@
       <kinematic>true</kinematic>
     </gazebo>
 
+    <gazebo>
+
+      <xacro:if value="$(arg use_ros_control_for_base)">
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+          <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+          <odometryTopic>/ground_truth_odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <odometryRate>20.0</odometryRate>
+          <robotBaseFrame>ground_truth_frame</robotBaseFrame>
+        </plugin>
+      </xacro:if>
+
+      <xacro:unless value="$(arg use_ros_control_for_base)">
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+          <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+          <odometryTopic>/odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <odometryRate>20.0</odometryRate>
+          <robotBaseFrame>base_footprint</robotBaseFrame>
+        </plugin>
+        
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <jointName>
+              wheel_front_left_joint, wheel_front_right_joint, wheel_rear_left_joint, wheel_rear_right_joint
+            </jointName>
+            <updateRate>50</updateRate>
+            <alwaysOn>true</alwaysOn>
+        </plugin>
+      </xacro:unless>
+
+    </gazebo>
+
   </xacro:macro>
-
-  <gazebo>
-
-    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
-      <odometryTopic>/ground_truth_odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <odometryRate>20.0</odometryRate>
-      <robotBaseFrame>ground_truth_frame</robotBaseFrame>
-    </plugin>
-
-<!--
-    <plugin name="object_controller" filename="libgazebo_ros_force_based_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>/odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <odometryRate>20.0</odometryRate>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
-    </plugin>
- -->
-
-  </gazebo>
 
 </robot>

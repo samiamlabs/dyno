@@ -4,6 +4,8 @@
   <arg name="config_locks"  default="$(find dyno_navigation)/config/twist_mux/twist_mux_locks.yaml"/>
   <arg name="config_topics" default="$(find dyno_navigation)/config/twist_mux/twist_mux_topics.yaml"/>
 
+  <arg name="base" default="$(env DYNO_BASE)"/>
+
   <!-- Gazebo -->
   <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
 
@@ -13,7 +15,8 @@
    -->
   <node name="odom_relay" pkg="topic_tools" type="relay"
           args="/mobile_base_controller/odom /odom"/>
-  <include file="$(find dyno_control)/launch/mecanum_controllers.launch"/>
+
+  <include file="$(find dyno_control)/launch/base_controllers.launch"/>
 
   <!-- Publish joint states on tf -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
@@ -25,8 +28,8 @@
   <!--
   <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering"/>
   <remap from="cmd_vel" to="/mobile_base_controller/cmd_vel"/>
-  <include file="$(find dyno_teleop)/launch/ps4.launch"/>
   -->
+  <include file="$(find dyno_teleop)/launch/joy.launch"/>
 
   <!-- Twist mux -->
   <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">

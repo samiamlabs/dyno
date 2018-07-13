@@ -1,19 +1,21 @@
 <launch>
+
   <!-- Gazebo -->
   <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
 
   <!-- Controller -->
-  <include file="$(find dyno_control)/launch/mecanum_controllers.launch"/>
+  <group if="$(env DYNO_USE_ROS_CONTROL_FOR_BASE)">
+    <include file="$(find dyno_control)/launch/base_controllers.launch"/>
+  </group>
 
   <!-- Publish joint states on tf -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 
   <!-- Show in Rviz -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_mecanum_controller.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_controlles.rviz"/>
 
   <!-- Teleop -->
-  <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering"/>
   <remap from="cmd_vel" to="/mobile_base_controller/cmd_vel"/>
-  <include file="$(find dyno_teleop)/launch/ps4.launch"/>
+  <include file="$(find dyno_teleop)/launch/joy.launch"/>
 
 </launch>

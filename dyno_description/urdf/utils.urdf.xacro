@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  
+
   <!-- Constants -->
   <xacro:property name="M_PI" value="3.1415926535897931"/>
 
@@ -12,5 +12,18 @@
 
   <xacro:macro name="box_inertia" params="m x y z">
     <inertia ixx="${m*(y*y+z*z)/12}" ixy="0" ixz="0" iyy="${m*(z*z+x*x)/12}" iyz="0" izz="${m*(x*x+y*y)/12}"/>
+  </xacro:macro>
+
+  <xacro:macro name="simple_transmission" params="name interface" >
+    <transmission name="${name}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${name}">
+        <hardwareInterface>hardware_interface/${interface}</hardwareInterface>
+      </joint>
+      <actuator name="${name}_motor">
+        <mechanicalReduction>10</mechanicalReduction>
+        <hardwareInterface>hardware_interface/${interface}</hardwareInterface>
+      </actuator>
+    </transmission>
   </xacro:macro>
 </robot>

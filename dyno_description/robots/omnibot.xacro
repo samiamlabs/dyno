@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno" >
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno_omnibot" >
+  <xacro:arg name="use_ros_control_for_base" default="true"/>
 
   <xacro:include filename="../urdf/materials/materials.xacro"/>
   <xacro:include filename="../urdf/utils.urdf.xacro"/>
@@ -8,20 +9,16 @@
 
   <!-- Set up definitions of parts of robot body -->
   <xacro:include filename="../urdf/base/omnibot_base.urdf.xacro"/>
-  <xacro:include filename="../urdf/sensors/sweep.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
   <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
 
   <!-- Use macros to define the actual robot -->
   <base/>
 
-  <joint name="sweep_mount_joint" type="fixed">
-    <origin xyz="0 0 0.07" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="sweep_mount_link"/>
-  </joint>
+  <!-- Laser Scanner -->
+  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.1" yaw_offset="0" parent="base_link"/>
 
-  <sweep name="sweep" ros_topic="scan" min_angle="${-pi}" max_angle="${pi}"/>
-
-  <imu/>
+  <!-- Imu -->
+  <imu x_offset="0" y_offset="0" z_offset="0"/>
 
 </robot>

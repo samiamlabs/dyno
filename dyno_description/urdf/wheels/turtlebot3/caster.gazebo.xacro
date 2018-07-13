@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="caster_gazebo" params="name">
+    <!-- Contact model for the caster wheel surface -->
+    <gazebo reference="${name}_link">
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+      <minDepth>0.001</minDepth>
+      <maxVel>1.0</maxVel>
+      <material>Gazebo/FlatBlack</material>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

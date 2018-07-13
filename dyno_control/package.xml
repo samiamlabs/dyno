@@ -17,7 +17,8 @@
   <depend>position_controllers</depend>
   <depend>velocity_controllers</depend>
 
-  <depend>mecanum_controller</depend>
+  <depend>diff_drive_controller</depend>
+  <depend>four_wheel_steering_controller</depend>
 
   <export>
 

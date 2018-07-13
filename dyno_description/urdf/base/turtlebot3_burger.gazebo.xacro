@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<robot name="turtlebot3_burger_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="base_gazebo">
+
+    <gazebo reference="base_link">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+    
+    <xacro:unless value="$(arg use_ros_control_for_base)">
+      <gazebo>
+        <plugin name="diff_dirve_controller" filename="libgazebo_ros_diff_drive.so">
+          <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+          <odometryTopic>odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <robotBaseFrame>base_footprint</robotBaseFrame>
+          <publishWheelTF>false</publishWheelTF>
+          <publishTf>true</publishTf>
+          <publishWheelJointState>true</publishWheelJointState>
+          <legacyMode>false</legacyMode>
+          <updateRate>30</updateRate>
+          <leftJoint>wheel_left_joint</leftJoint>
+          <rightJoint>wheel_right_joint</rightJoint>
+          <wheelSeparation>0.160</wheelSeparation>
+          <wheelDiameter>0.066</wheelDiameter>
+          <wheelAcceleration>1</wheelAcceleration>
+          <wheelTorque>10</wheelTorque>
+          <rosDebugLevel>na</rosDebugLevel>
+        </plugin>
+      </gazebo>
+    </xacro:unless>
+
+  </xacro:macro>
+
+</robot>

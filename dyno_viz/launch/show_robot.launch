@@ -1,8 +1,7 @@
 <launch>
   <arg name="base" default="$(env DYNO_BASE)"/>
 
-  <param name="robot_description"
-    command="$(find xacro)/xacro '$(find dyno_description)/robots/$(arg base).xacro'"/>
+  <include file="$(find dyno_description)/launch/load_robot_description.launch"/>
 
   <!-- Send fake joint values -->
   <node name="joint_state_publihser" pkg="joint_state_publisher" type="joint_state_publisher">

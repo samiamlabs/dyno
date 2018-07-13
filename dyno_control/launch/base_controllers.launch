@@ -1,0 +1,16 @@
+<launch>
+  <arg name="base" default="$(env DYNO_BASE)"/>
+
+  <group if="$(eval base == 'turtlebot3' or base == 'diff_drive' or base == 'magni')">
+    <include file="$(find dyno_control)/launch/diff_drive_controllers.launch"/>
+  </group>
+
+  <group if="$(eval base == 'omnibot')">
+    <include file="$(find dyno_control)/launch/mecanum_controllers.launch"/>
+  </group>
+
+  <group if="$(eval base == 'holonomic')">
+    <include file="$(find dyno_control)/launch/four_wheel_steering_controllers.launch"/>
+  </group>
+
+</launch>

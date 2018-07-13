@@ -44,7 +44,9 @@
 
     <!-- Transmission -->
 
-    <wheel_transmission name="${name}"/>
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <wheel_transmission name="${name}"/>
+    </xacro:if>
 
     <!-- Gazebo extensions -->
     <drive_wheel_gazebo name="${name}"/>

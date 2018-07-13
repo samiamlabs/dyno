@@ -4,7 +4,7 @@
 
   <xacro:macro name="magni_base_gazebo">
     <gazebo reference="base_link">
-    <material>Gazebo/Green</material>
+    <material>Gazebo/Blue</material>
     </gazebo>
 
     <gazebo reference="base_footprint">
@@ -17,6 +17,30 @@
       <minDepth>0.0005</minDepth>
       <laserRetro>0</laserRetro>
     </gazebo>
+
+    <xacro:unless value="$(arg use_ros_control_for_base)">
+      <gazebo>
+        <plugin name="diff_dirve_controller" filename="libgazebo_ros_diff_drive.so">
+          <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+          <odometryTopic>odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <robotBaseFrame>base_footprint</robotBaseFrame>
+          <publishWheelTF>false</publishWheelTF>
+          <publishTf>true</publishTf>
+          <publishWheelJointState>true</publishWheelJointState>
+          <legacyMode>false</legacyMode>
+          <updateRate>30</updateRate>
+          <leftJoint>wheel_left_joint</leftJoint>
+          <rightJoint>wheel_right_joint</rightJoint>
+          <wheelSeparation>${wheel_separation}</wheelSeparation>
+          <wheelDiameter>${wheel_radius*2}</wheelDiameter>
+          <wheelAcceleration>1</wheelAcceleration>
+          <wheelTorque>10</wheelTorque>
+          <rosDebugLevel>na</rosDebugLevel>
+        </plugin>
+      </gazebo>
+    </xacro:unless>
+
   </xacro:macro>
 
 

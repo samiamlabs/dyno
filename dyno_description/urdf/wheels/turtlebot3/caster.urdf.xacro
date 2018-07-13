@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="caster.gazebo.xacro"/>
+
+  <xacro:macro name="caster" params="name x_offset z_offset r_offset parent">
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+      <origin xyz="${x_offset} 0 ${z_offset}" rpy="${r_offset} 0 0"/>
+    </joint>
+
+    <link name="${name}_link">
+      <collision>
+        <origin xyz="0 0.001 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.030 0.009 0.020"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" />
+        <mass value="0.005" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                 iyy="0.001" iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+    </link>
+
+    <!-- Gazebo extensions -->
+    <caster_gazebo name="${name}"/>
+
+  </xacro:macro>
+</robot>

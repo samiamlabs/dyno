@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="drive_wheel_gazebo" params="name">
+
+  <!-- Contact model for the wheel surface -->
+  <!-- TEMPORARY: Set friction very low and control base with gazebo planar move -->
+  <gazebo reference="${name}_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  </xacro:macro>
+
+</robot>

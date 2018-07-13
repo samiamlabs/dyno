@@ -11,10 +11,10 @@
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <xacro:if value="${type == 'left'}">
-            <mesh filename="package://dyno_description/meshes/mecanum_wheel.stl" scale="0.001 0.001 0.001"/>
+            <mesh filename="package://dyno_description/meshes/wheels/mecanum_wheel.stl" scale="0.001 0.001 0.001"/>
           </xacro:if>
           <xacro:if value="${type == 'right'}">
-            <mesh filename="package://dyno_description/meshes/mecanum_wheel.stl" scale="0.001 0.001 -0.001"/>
+            <mesh filename="package://dyno_description/meshes/wheels/mecanum_wheel.stl" scale="0.001 0.001 -0.001"/>
           </xacro:if>
         </geometry>
         <material name="grey"/>
@@ -49,7 +49,9 @@
 
     <!-- Transmission -->
 
-    <wheel_transmission name="${name}"/>
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <wheel_transmission name="${name}"/>
+    </xacro:if>
 
     <!-- Gazebo extensions -->
     <mecanum_wheel_gazebo name="${name}"/>

@@ -2,19 +2,6 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="simple_transmission" params="name interface" >
-    <transmission name="${name}_trans">
-      <type>transmission_interface/SimpleTransmission</type>
-      <joint name="${name}">
-        <hardwareInterface>hardware_interface/${interface}</hardwareInterface>
-      </joint>
-      <actuator name="${name}_motor">
-        <mechanicalReduction>10</mechanicalReduction>
-        <hardwareInterface>hardware_interface/${interface}</hardwareInterface>
-      </actuator>
-    </transmission>
-  </xacro:macro>
-
   <xacro:macro name="gazebo_tire_link" params="name color">
     <gazebo reference="${name}">
       <material>Gazebo/${color}</material>

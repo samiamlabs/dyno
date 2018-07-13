@@ -9,38 +9,38 @@
   <xacro:include filename="../wheels/magni/caster.urdf.xacro"/>
 
   <!-- Drive wheel characteristics -->
-  <xacro:property name="wheel_radius"     value="0.13"/>
+  <xacro:property name="wheel_radius"     value="0.1"/>
   <xacro:property name="wheel_width"      value="0.05"/>
-  <xacro:property name="wheel_separation" value="0.65"/>
+  <xacro:property name="wheel_separation" value="0.33"/>
   <xacro:property name="wheel_torque"     value="6.0"/>
   <xacro:property name="wheel_velocity"   value="1.0"/>
 
   <!-- Caster characteristics -->
-  <xacro:property name="caster_radius" value="0.07"/>
+  <xacro:property name="caster_radius" value="0.05"/>
   <xacro:property name="caster_ground_offset" value="0.005"/>
 
   <!-- Base -->
   <xacro:macro name="base">
     <link name="base_link">
       <visual>
-        <origin xyz="-0.2 0 0" rpy="0 0 0"/>
+        <origin xyz="-0.11 0 0.05" rpy="0 0 0"/>
         <geometry>
-          <box size="0.6 0.6 0.2"/>
+          <box size="${wheel_separation*1.3} ${wheel_separation-wheel_width} 0.25"/>
         </geometry>
         <material name="blue"/>
       </visual>
 
       <collision>
-        <origin xyz="-0.2 0 0" rpy="0 0 0"/>
+        <origin xyz="-0.11 0 0.05" rpy="0 0 0"/>
         <geometry>
-          <box size="0.6 0.6 0.2"/>
+          <box size="${wheel_separation*1.3} ${wheel_separation-wheel_width} 0.25"/>
         </geometry>
         <material name="orange"/>
       </collision>
 
-      <!-- TODO: update according to real base properties -->
+      <!-- TODO: update according to real base properties -->2
       <inertial>
-        <origin xyz="-0.00000106 0.00000109 0.0000387" rpy="0 0 0"/>
+        <origin xyz="-0.15 0 0" rpy="0 0 0"/>
         <mass value="15.0"/>
         <inertia ixx="0.465408937" ixy="0.002160024" ixz="-0.001760255"
                  iyy="0.483193291" iyz="-0.000655952"
@@ -62,8 +62,8 @@
     <drive_wheel name="wheel_right" radius="${wheel_radius}" width="${wheel_width}" separation="${wheel_separation}" reflect="1.0" parent="base_link"/>
     <drive_wheel name="wheel_left" radius="${wheel_radius}" width="${wheel_width}" separation="${wheel_separation}" reflect="-1.0" parent="base_link"/>
 
-    <caster name="right_caster" radius="${caster_radius}" x_offset="-0.5" y_offset="-0.3" z_offset="${caster_ground_offset - (wheel_radius - caster_radius)}" parent="base_link"/>
-    <caster name="left_caster" radius="${caster_radius}" x_offset="-0.5" y_offset="0.3" z_offset="${caster_ground_offset - (wheel_radius - caster_radius)}" parent="base_link"/>
+    <caster name="right_caster" radius="${caster_radius}" x_offset="-0.27" y_offset="${wheel_separation/2}" z_offset="${caster_ground_offset - (wheel_radius - caster_radius)}" parent="base_link"/>
+    <caster name="left_caster" radius="${caster_radius}" x_offset="-0.27" y_offset="${-wheel_separation/2}" z_offset="${caster_ground_offset - (wheel_radius - caster_radius)}" parent="base_link"/>
 
 
     <!-- Gazebo extentions -->

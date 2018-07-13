@@ -1,0 +1,6 @@
+<launch>
+  <arg name="base" default="$(env DYNO_BASE)"/>
+  <arg name="use_ros_control_for_base" default="$(env DYNO_USE_ROS_CONTROL_FOR_BASE)"/>
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find dyno_description)/robots/$(arg base).xacro' use_ros_control_for_base:=$(arg use_ros_control_for_base)"/>
+</launch>

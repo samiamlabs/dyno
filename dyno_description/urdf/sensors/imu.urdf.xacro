@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="imu.gazebo.xacro"/>
 
-  <xacro:macro name="imu">
+
+  <xacro:include filename="imu.gazebo.xacro"/>
+  <xacro:macro name="imu" params="x_offset y_offset z_offset">
 
     <link name="imu_link"/>
 
     <joint name="imu_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${x_offset} ${y_offset} ${z_offset}" rpy="0 0 0"/>
       <parent link="base_link"/>
       <child link="imu_link"/>
     </joint>
 
-    <imu_gazebo/>
   </xacro:macro>
 
 </robot>

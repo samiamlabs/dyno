@@ -5,7 +5,7 @@
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
-    
+
     <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
       <frameName>map</frameName>
       <bodyName>base_footprint</bodyName>
@@ -13,4 +13,6 @@
       <updateRate>30.0</updateRate>
     </plugin>
   </gazebo>
+
+
 </robot>
