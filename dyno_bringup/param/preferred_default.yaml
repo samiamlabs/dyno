@@ -1,4 +1,4 @@
 # Uncomment and modify below to explicitly set the preferred
 # implementation for an ancestor rapp specification:
 preferred:
-  'dyno_rapps/waypoint_navigation': 'dyno_rapps/waypoint_navigation'
+  'dyno_common_rapps/waypoint_navigation': 'dyno_common_rapps/waypoint_navigation'

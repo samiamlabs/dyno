@@ -19,10 +19,9 @@
 : ${DYNO_BASE:=omnibot}
 : ${DYNO_RAPP_PACKAGE_WHITELIST:=[rocon_apps, dyno_rapps]}
 : ${DYNO_RAPP_PACKAGE_BLACKLIST:=[]}
-: ${DYNO_INTERACTIONS_LIST:=[dyno_interactions/web, dyno_interactions/pairing]}
 : ${DYNO_HUB_URI:=http://localhost:6380}
 : ${DYNO_CONCERT_DISABLE_ZEROCONF:=false}
-: ${DYNO_DEFAULT_RAPP:=dyno_rapps/waypoint_navigation}
+: ${DYNO_DEFAULT_RAPP:=dyno_common_rapps/waypoint_navigation}
 : ${DYNO_PERFORMANCE:=false}
 : ${DYNO_FAKE_ODOM:=false}
 : ${DYNO_USE_ROS_CONTROL_FOR_BASE=false}
@@ -37,7 +36,6 @@ export DYNO_SIMULATION
 export DYNO_BASE
 export DYNO_RAPP_PACKAGE_WHITELIST
 export DYNO_RAPP_PACKAGE_BLACKLIST
-export DYNO_INTERACTIONS_LIST
 export DYNO_HUB_URI
 export DYNO_CONCERT_DISABLE_ZEROCONF
 export DYNO_DEFAULT_RAPP

@@ -1,0 +1,17 @@
+display:          Waypoint Navigation
+description:      Waypoint Navigation
+compatibility:    rocon:/
+launch:           waypoint_navigation.launch
+icon:             waypoint_navigation.png
+public_interface: waypoint_navigation.interface
+required_capabilities:
+  - name: dyno_capabilities/Navigation
+    interface:
+      topics:
+        requires: []
+        provides: []
+  - name: dyno_capabilities/Diagnostics
+    interface:
+      topics:
+        requires: []
+        provides: []

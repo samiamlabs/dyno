@@ -13,15 +13,18 @@
 
  -->
 <launch>
+
+  <include file="$(find dyno_description)/launch/load_robot_description.launch"/>
+
   <!-- ****************************** Robot Args ****************************** -->
-  <arg name="robot_name"        default="Ann" doc="used for rocon_uri rapp compatibility checks"/>
+  <arg name="robot_name"        default="dyno" doc="used for rocon_uri rapp compatibility checks"/>
   <arg name="robot_type"        default="robot_other" doc="used for rocon_uri rapp compatibility checks"/>
   <arg name="robot_icon"        default="rocon_icons/cybernetic_pirate.png"   doc="easily identifiable icon for this robot"/>
   <arg name="robot_description" default="To err is human, to 'arr is pirate." doc="informative doc string about this robot"/>
 
   <!-- ****************************** Rapp Manager ****************************** -->
   <arg name="auto_start_rapp" default="$(env DYNO_DEFAULT_RAPP)" doc="autostart a rapp, e.g. 'rocon_apps/chirp'"/>
-  <arg name="rapp_package_whitelist" default="[dyno_rapps]" doc="comma separated list of package names to restrict rapp search"/>
+  <arg name="rapp_package_whitelist" default="[dyno_common_rapps]" doc="comma separated list of package names to restrict rapp search"/>
   <arg name="rapp_package_blacklist" default="[]" doc="comma separated list of package names to blacklist from the rapp search"/>/>
   <arg name="rapp_preferred_configuration_file" default="$(find dyno_bringup)/param/preferred_default.yaml" doc="pointer to a yaml file listing preferred rapps"/>
   <arg name="screen" default="true" doc="verbose output from running apps"/>
@@ -107,7 +110,7 @@
   </group>
 
   <!-- ****************************** Capabilities ****************************** -->
-  <!-- Optionally load up a capability server underneath the rapp manager (default: no) -->
+  <!-- Optionally load up a capability server underneath the rapp manager (default: yes) -->
 
   <arg name="capabilities"                       default="true" doc="enable/disable a capability server" />
   <arg name="capabilities_parameters"            default="$(find dyno_bringup)/param/capability_providers.yaml" doc="detailed parameter configuration for the providers" />
@@ -127,23 +130,6 @@
   </group>
 
   <!-- ***************************** Interactions ******************************* -->
-  <!-- Optionally load up interactions next to the rapp manager (default: no) -->
-  <arg name="interactions"         default="false" doc="enable/disable interactions"/>
-  <arg name="interactions_list"    default="[]"    doc="comma separated list of package resource names pointing to yaml interaction configurations (doesn't need the .interactions extension), e.g. [rocon_interactions/pairing]"/>
-  <arg name="rosbridge_address"    default="localhost"/>
-  <arg name="rosbridge_port"       default="9090"/>
-  <arg name="webserver_address"    default="webapp.robotconcert.org"/>
-  <arg name="auto_start_pairing"   default="" doc="auto start a pre-configured rapp for interactions, e.g. 'Talker'"/>
-
-  <group if="$(arg interactions)" ns="rocon">
-    <include file="$(find rocon_app_manager)/launch/includes/_interactions.xml">
-      <arg name="interactions_list"  value="$(arg interactions_list)"/>
-      <arg name="auto_start_pairing" value="$(arg auto_start_pairing)"/>
-      <arg name="rosbridge_address"  value="$(arg rosbridge_address)"/>
-      <arg name="rosbridge_port"     value="$(arg rosbridge_port)"/>
-      <arg name="webserver_address"  value="$(arg webserver_address)"/>
-    </include>
-  </group>
 
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
 

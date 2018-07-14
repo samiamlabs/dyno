@@ -1,0 +1,15 @@
+publishers:
+  - name: robot_pose
+    type: geometry_msgs/PoseStamped
+  - name: current_goal
+    type: geometry_msgs/PoseStamped
+  - name: path_plan
+    type: nav_msgs/Path
+subscribers:
+  - name: map
+    type: nav_msgs/OccupancyGrid
+  - name: map_metadata
+    type: nab_msgs/MapMetaData
+services: []
+action_clients: []
+action_servers: []

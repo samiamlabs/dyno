@@ -1,0 +1,12 @@
+display:          Exploration
+description:      Exploration
+compatibility:    rocon:/
+launch:           exploration.launch
+icon:             exploration.png
+public_interface: exploration.interface
+required_capabilities:
+  - name: dyno_capabilities/Navigation
+    interface:
+      topics:
+        requires: []
+        provides: []
