@@ -55,9 +55,15 @@ class JoystickTeleop():
             self._dead_mans_switch = msg.buttons[4] == 1
         elif self._type == "gamepad":
             self._twist.linear.x = msg.axes[0]
-            self._twist.linear.y = 0.0
-            self._twist.angular.z = -msg.axes[1]
-            self._dead_mans_switch = msg.buttons[3] == 1
+
+            if msg.buttons[1] == 1:
+                self._twist.linear.y = -msg.axes[1]
+                self._twist.angular.z = 0.0
+            else:
+                self._twist.linear.y = 0.0
+                self._twist.angular.z = -msg.axes[1]
+
+            self._dead_mans_switch = msg.buttons[3] == 1 or msg.buttons[1] == 1
         else:
             rospy.logerr("Joystick type '%s' is not supported!", self._type)
 

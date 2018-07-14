@@ -26,6 +26,7 @@
 : ${DYNO_PERFORMANCE:=false}
 : ${DYNO_FAKE_ODOM:=false}
 : ${DYNO_USE_ROS_CONTROL_FOR_BASE=false}
+: ${DYNO_JOY_TYPE=gamepad}
 : ${JOY_SERIAL_PORT:=/dev/input/js0}
 : ${ROS_MASTER_URI=http://localhost:11311}
 : ${ROS_HOSTNAME=localhost}
@@ -43,6 +44,7 @@ export DYNO_DEFAULT_RAPP
 export DYNO_PERFORMANCE
 export DYNO_FAKE_ODOM
 export DYNO_USE_ROS_CONTROL_FOR_BASE
+export DYNO_JOY_TYPE=gamepad
 export JOY_SERIAL_PORT
 export ROS_MASTER_URI
 export ROS_HOSTNAME
