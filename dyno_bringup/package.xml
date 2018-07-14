@@ -4,11 +4,9 @@
   <version>0.0.0</version>
   <description>The dyno_bringup package</description>
 
-  <maintainer email="samuellindgren91@gmail.com">Samuel Lindgren</maintainer>
-
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
 
   <license>BSD</license>
-
 
   <buildtool_depend>catkin</buildtool_depend>
 

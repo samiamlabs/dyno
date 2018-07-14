@@ -1,0 +1,19 @@
+%YAML 1.1
+---
+name: MobileBase
+spec_version: 1
+spec_type: interface
+description: 'This interface describes the basic ROS interface for controlling a mobile base'
+interface:
+  topics:
+    requires:
+      '/cmd_vel':
+        type: 'geometry_msgs/Twist'
+        description: 'Command Velocities to move the base of the robot, only the x component of the linear velocity and the z, also known as yaw, component of the angular velocity are used. The units follow REP-0103 such that the linear velocity is measured in m/s and the angular rate is measured in radians/s.'
+    provides:
+      '/joint_states':
+        type: 'sensor_msgs/JointStates'
+        description: 'The joint states of the mobile base. This message should have valid values for at least two joints, i.e. the powered wheels.'
+      '/odom':
+        type: 'nav_msgs/Odometry'
+        description: 'Odometry of the mobile base. The message should have valid values for the x and y components of the pose.pose.position as well as the z, also known as yaw, component of the pose.pose.orientation. If velocities are available they should be filled into the twist.twist submessage. If the covariance of either the pose or the twist is known it should also be filled in.'

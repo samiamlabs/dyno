@@ -1,0 +1,6 @@
+%YAML 1.1
+---
+name: Localization
+spec_version: 1
+spec_type: interface
+description: 'This interface describes the basic ROS components used in standard localization.'

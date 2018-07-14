@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="fake_localization" args="0 0 0 0 0 0 1 map odom 5" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find dyno_hsr_localization)/states/sigverse.yaml" />
+</launch>

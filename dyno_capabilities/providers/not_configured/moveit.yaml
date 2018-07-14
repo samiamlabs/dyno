@@ -1,0 +1,7 @@
+%YAML 1.1
+---
+name: moveit
+spec_version: 1
+spec_type: provider
+implements: dyno_hsr_capabilities/ObjectManipulation
+launch_file: 'launch/moveit.launch.xml'

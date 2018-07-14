@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+from __future__ import division
+from __future__ import unicode_literals
+
+import roslib
+import rospy
+import diagnostic_updater
+import diagnostic_msgs
+import std_msgs
+import random
+
+
+class Battery:
+    def __init__(self):
+        self.updater = diagnostic_updater.Updater()
+        self.updater.setHardwareID("Battery")
+
+        self.level = 0.9
+        self.updater.add('Battery level', self.check_level)
+
+        self.battery_level_timer = 0.1
+        self.last_battery_update = rospy.get_time()
+
+    def check_level(self, stat):
+        if self.level == 0:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
+                         "Battery is out of power")
+        if self.level < 0.1:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN,
+                         "Battery level low")
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK,
+                         "Battery level ok")
+
+        stat.add("Level", self.level)
+        return stat
+
+    def update(self):
+        if self.level > 0.01:
+            delta_time = rospy.get_time() - self.last_battery_update
+            if delta_time > self.battery_level_timer:
+                self.level -= 0.005
+                self.last_battery_update = rospy.get_time()
+        else:
+            self.level = 1.0
+
+        self.updater.update()
+
+
+class FakeBattery():
+    def __init__(self):
+        rospy.init_node("fake_battery")
+
+        self.battery = Battery()
+
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            self.battery.update()
+            rate.sleep()
+
+
+if __name__ == '__main__':
+    fakeBattery = FakeBattery()

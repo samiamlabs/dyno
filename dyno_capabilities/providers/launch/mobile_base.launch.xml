@@ -1,0 +1,27 @@
+<launch>
+  <arg name="cmd_vel_out" default="/mobile_base_controller/cmd_vel"/>
+
+  <arg name="config_locks"  default="$(find dyno_control)/config/twist_mux/twist_mux_locks.yaml"/>
+  <arg name="config_topics" default="$(find dyno_control)/config/twist_mux/twist_mux_topics.yaml"/>
+
+  <!-- Base Controller -->
+  <node name="odom_relay" pkg="topic_tools" type="relay"
+          args="/mobile_base_controller/odom /odom"/>
+          
+  <remap from="/mobile_base_controller/odom" to="/odom"/>
+
+  <group if="$(env DYNO_USE_ROS_CONTROL_FOR_BASE)">
+    <include file="$(find dyno_control)/launch/base_controllers.launch"/>
+  </group>
+
+  <!-- Teleop -->
+  <include file="$(find dyno_teleop)/launch/joy.launch"/>
+
+  <!-- Twist mux -->
+  <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+    <remap from="cmd_vel_out" to="$(arg cmd_vel_out)"/>
+    <rosparam file="$(arg config_locks)"  command="load"/>
+    <rosparam file="$(arg config_topics)" command="load"/>
+  </node>
+
+</launch>

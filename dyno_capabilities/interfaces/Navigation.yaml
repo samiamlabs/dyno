@@ -1,0 +1,16 @@
+%YAML 1.1
+---
+name: Navigation
+spec_version: 1
+spec_type: interface
+description: 'This interface describes the basic ROS components used in standard 2D mapping.'
+interface:
+  topics:
+    requires:
+      'goal':
+        type: 'geometry_msgs/PoseStamped'
+        description: 'Two dimensional navigation goal to which the robot should try to navigate.'
+    provides:
+      'cmd_vel':
+        type: 'geometry_msgs/Twist'
+        description: 'Command velocities for ar mobile base to follow.'

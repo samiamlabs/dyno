@@ -1,6 +1,7 @@
 # default providers
 defaults:
-  'dyno_capabilities/DifferentialMobileBase': 'dyno_capabilities/differential_mobile_base'
+  'dyno_capabilities/MobileBase': 'dyno_capabilities/mobile_base'
   'dyno_capabilities/RobotStatePublisher':    'dyno_capabilities/robot_state_publisher'
-  'dyno_capabilities/Navigation2D':           'dyno_capabilities/cartographer_navigation'
+  'dyno_capabilities/Navigation':           'dyno_capabilities/navigation'
+  'dyno_capabilities/Localization':           'dyno_capabilities/cartographer_mapping_2d'
   'dyno_capabilities/Diagnostics':            'dyno_capabilities/diagnostics'

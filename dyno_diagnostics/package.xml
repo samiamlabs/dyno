@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>dyno_gazebo</name>
+  <name>dyno_diagnostics</name>
   <version>0.0.0</version>
-  <description>The dyno_gazebo package</description>
+  <description>The dyno_diagnostics package</description>
 
   <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
 
@@ -16,11 +16,8 @@
 
   <depend>rostest</depend>
   <depend>rosunit</depend>
-
-  <depend>gazebo_ros</depend>
-  <depend>gazebo_plugins</depend>
-  <depend>gazebo_ros_control</depend>
-  <depend>control_toolbox</depend>
+  <depend>diagnostic_common_diagnostics</depend>
+  <depend>diagnostic_updater</depend>
 
   <export>
 

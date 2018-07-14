@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_capabilities</name>
+  <version>0.0.0</version>
+  <description>The dyno_capabilities package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <capability_interface>
+      interfaces/RobotStatePublisher.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/robot_state_publisher.yaml
+    </capability_provider>
+
+    <capability_interface>
+      interfaces/MobileBase.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/mobile_base.yaml
+    </capability_provider>
+
+    <capability_interface>
+      interfaces/Localization.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/cartographer_mapping_2d.yaml
+    </capability_provider>
+
+    <capability_interface>
+      interfaces/Navigation.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/navigation.yaml
+    </capability_provider>
+
+    <capability_interface>
+      interfaces/Diagnostics.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/diagnostics.yaml
+    </capability_provider>
+
+
+<!--
+    <capability_provider>
+      providers/cartographer_localization_2d.yaml
+    </capability_provider>
+
+
+    <capability_provider>
+      providers/cartographer_localization_3d.yaml
+    </capability_provider>
+
+    <capability_provider>
+      providers/fake_localization.yaml
+    </capability_provider>
+
+    <capability_interface>
+      interfaces/ObjectManipulation.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/moveit.yaml
+    </capability_provider>
+
+    <capability_provider>
+      providers/moveit_octomap.yaml
+    </capability_provider>
+     -->
+  </export>
+
+</package>

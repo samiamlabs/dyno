@@ -1,0 +1,9 @@
+%YAML 1.1
+---
+name: mobile_base
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/MobileBase
+depends_on:
+   ['dyno_capabilities/Diagnostics']
+launch_file: 'launch/mobile_base.launch.xml'

@@ -1,0 +1,18 @@
+<launch>
+  <include file="$(find dyno_hsr_sigverse)/launch/trajectory_controller_action_servers.launch"/>
+  <include file="$(find dyno_hsr_moveit)/launch/moveit_planning_execution.launch"/>
+
+  <node name="dropper" pkg="topic_tools" type="drop" args="/hsrb/head_rgbd_sensor/depth/image_raw 1 2"/>
+
+  <node pkg="nodelet" type="nodelet" name="image_processing_manager" args="manager"/>
+  <node pkg="nodelet" type="nodelet" name="metricizer" args="load depth_image_proc/convert_metric image_processing_manager">
+    <remap from="image_raw" to="/hsrb/head_rgbd_sensor/depth/image_raw_drop"/>
+    <remap from="image" to="/image_rect"/>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="cloudifier" args="load depth_image_proc/point_cloud_xyz image_processing_manager">
+    <remap from="camera_info" to="/hsrb/head_rgbd_sensor/depth/camera_info"/>
+    <remap from="image_rect" to="/image_rect"/>
+  </node>
+
+</launch>

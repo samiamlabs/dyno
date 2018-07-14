@@ -1,0 +1,17 @@
+<launch>
+
+  <node pkg="dyno_diagnostics" type="fake_battery" name="fake_battery"/>
+  <node pkg="dyno_diagnostics" type="fake_lidar" name="fake_lidar"/>
+
+  <node pkg="diagnostic_common_diagnostics" type="cpu_monitor.py" name="cpu_monitor"/>
+  <node pkg="diagnostic_common_diagnostics" type="tf_monitor.py" name="tf_monitor"/>
+
+  <node
+        pkg="diagnostic_aggregator" type="aggregator_node"
+        name="diag_agg" args="CPP" output="screen" >
+    <rosparam command="load"
+              file="$(find dyno_diagnostics)/config/dyno_analyzers.yaml" />
+
+  </node>
+
+</launch>

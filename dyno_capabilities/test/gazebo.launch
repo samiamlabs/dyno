@@ -1,0 +1,30 @@
+<launch>
+
+  <!-- ****************************** Capabilities ****************************** -->
+  <arg name="capabilities"                       default="true" doc="enable/disable a capability server" />
+  <arg name="capabilities_parameters"            default="$(find dyno_bringup)/param/capability_providers.yaml" doc="detailed parameter configuration for the providers" />
+  <arg name="capabilities_blacklist"             default="[]" doc="blacklist specific capabilities" />
+  <arg name="capabilities_nodelet_manager_name"  default="capability_server_nodelet_manager" />
+  <arg name="capabilities_package_whitelist"     default="[dyno_capabilities]" doc="get capabilities from these packages only" />
+  <arg name="capabilities_server_name"           default="capability_server"/>
+
+  <group if="$(arg capabilities)">
+    <include file="$(find rocon_app_manager)/launch/includes/_capabilities.xml">
+      <arg name="blacklist"            value="$(arg capabilities_blacklist)" />
+      <arg name="nodelet_manager_name" value="$(arg capabilities_nodelet_manager_name)" />
+      <arg name="name"                 value="$(arg capabilities_server_name)" />
+      <arg name="package_whitelist"    value="$(arg capabilities_package_whitelist)" />
+      <arg name="parameters"           value="$(arg capabilities_parameters)" />
+    </include>
+  </group>
+
+  <!-- Gazebo -->
+  <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
+
+  <!-- Show in Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_capabilities.rviz"/>
+
+  <!-- Rosbridge Websocket-->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+</launch>

@@ -1,0 +1,11 @@
+%YAML 1.1
+---
+name: navigation
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/Navigation
+depends_on:
+   ['dyno_capabilities/RobotStatePublisher',
+    'dyno_capabilities/MobileBase',
+    'dyno_capabilities/Localization']
+launch_file: 'launch/navigation.launch.xml'

@@ -1,0 +1,4 @@
+<launch>
+  <!-- Navigation -->
+  <include file="$(find dyno_navigation)/launch/move_base.launch"/>
+</launch>

@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find dyno_hsr_sigverse)/launch/trajectory_controller_action_servers.launch"/>
+  <include file="$(find dyno_hsr_moveit)/launch/moveit_planning_execution.launch"/>
+</launch>

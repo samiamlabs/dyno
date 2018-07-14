@@ -1,0 +1,20 @@
+%YAML 1.1
+---
+name: Diagnostics
+spec_version: 1
+spec_type: interface
+description: 'This interface describes the basic ROS interface for retrieving general diagnostic data of the robot.'
+interface:
+  topics:
+    requires:
+      '/diagnostics':
+        type: 'diagnostic_msgs/DiagnosticArray'
+        description: 'Gathers all published diagnostic data.'
+    provides:
+      '/diagnostics_agg':
+        type: 'diagnostic_msgs/DiagnosticArray'
+        description: 'Aggregated diagnostics data.'
+      '/diagnostics_toplevel_state':
+        type: 'diagnostic_msgs/DiagnosticStatus'
+        description: 'Toplevel diagnostics data.'
+# TODO: add required parameters

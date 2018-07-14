@@ -1,0 +1,7 @@
+%YAML 1.1
+---
+name: diagnostics
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/Diagnostics
+launch_file: 'launch/diagnostics.launch.xml'

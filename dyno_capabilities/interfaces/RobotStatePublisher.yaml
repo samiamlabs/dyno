@@ -1,0 +1,24 @@
+%YAML 1.1
+---
+name: RobotStatePublisher
+spec_version: 1
+spec_type: interface
+description: >
+                This interface describes the basic ROS interface for retrieving information about the robot's state.
+                This includes loading the robot's model description in URDF onto the parameter server,
+                publishing the robot's joint states and TF transformations.
+interface:
+  topics:
+    requires:
+      '/joint_states':
+        type: 'sensor_msgs/JointStates'
+        description: 'Name, position [rad], velocity [rad/sec] and effort [Nm] for each joint of the robot.'
+    provides:
+      '/tf':
+        type: 'tf2_msgs/TFMessage'
+        description: "TF transforms for a links of the robot described by robot's model"
+  parameters:
+    requires:
+      'robot_description':
+        type: 'URDF'
+        description: "Description of the robot's model in URDF"
