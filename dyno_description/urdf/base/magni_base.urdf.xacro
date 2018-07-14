@@ -16,7 +16,7 @@
   <xacro:property name="wheel_velocity"   value="1.0"/>
 
   <!-- Caster characteristics -->
-  <xacro:property name="caster_radius" value="0.05"/>
+  <xacro:property name="caster_radius" value="0.04"/>
   <xacro:property name="caster_ground_offset" value="0.005"/>
 
   <!-- Base -->

@@ -1,8 +1,8 @@
 <launch>
   <arg name="cmd_vel_out" default="/mobile_base_controller/cmd_vel"/>
 
-  <arg name="config_locks"  default="$(find dyno_navigation)/config/twist_mux/twist_mux_locks.yaml"/>
-  <arg name="config_topics" default="$(find dyno_navigation)/config/twist_mux/twist_mux_topics.yaml"/>
+  <arg name="config_locks"  default="$(find dyno_control)/config/twist_mux/twist_mux_locks.yaml"/>
+  <arg name="config_topics" default="$(find dyno_control)/config/twist_mux/twist_mux_topics.yaml"/>
 
   <arg name="base" default="$(env DYNO_BASE)"/>
 
@@ -16,19 +16,17 @@
   <node name="odom_relay" pkg="topic_tools" type="relay"
           args="/mobile_base_controller/odom /odom"/>
 
-  <include file="$(find dyno_control)/launch/base_controllers.launch"/>
+  <group if="$(env DYNO_USE_ROS_CONTROL_FOR_BASE)">
+    <include file="$(find dyno_control)/launch/base_controllers.launch"/>
+  </group>
 
   <!-- Publish joint states on tf -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 
   <!-- Show in Rviz -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_mecanum_controller.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_navigation.rviz"/>
 
   <!-- Teleop -->
-  <!--
-  <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering"/>
-  <remap from="cmd_vel" to="/mobile_base_controller/cmd_vel"/>
-  -->
   <include file="$(find dyno_teleop)/launch/joy.launch"/>
 
   <!-- Twist mux -->

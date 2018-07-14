@@ -1,4 +1,8 @@
 <launch>
+  <arg name="cmd_vel_out" default="/mobile_base_controller/cmd_vel"/>
+  
+  <arg name="config_locks"  default="$(find dyno_control)/config/twist_mux/twist_mux_locks.yaml"/>
+  <arg name="config_topics" default="$(find dyno_control)/config/twist_mux/twist_mux_topics.yaml"/>
 
   <!-- Gazebo -->
   <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
@@ -15,7 +19,14 @@
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_controlles.rviz"/>
 
   <!-- Teleop -->
-  <remap from="cmd_vel" to="/mobile_base_controller/cmd_vel"/>
+  <!-- <remap from="cmd_vel" to="/mobile_base_controller/cmd_vel"/> -->
   <include file="$(find dyno_teleop)/launch/joy.launch"/>
+
+  <!-- Twist mux -->
+  <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+    <remap from="cmd_vel_out" to="$(arg cmd_vel_out)"/>
+    <rosparam file="$(arg config_locks)"  command="load"/>
+    <rosparam file="$(arg config_topics)" command="load"/>
+  </node>
 
 </launch>

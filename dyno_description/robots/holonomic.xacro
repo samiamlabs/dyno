@@ -16,7 +16,7 @@
   <base/>
 
   <!-- Laser Scanner -->
-  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.17" yaw_offset="0" parent="base_link"/>
+  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.175" yaw_offset="0" parent="base_link"/>
 
   <!-- Imu -->
   <imu x_offset="0" y_offset="0" z_offset="0"/>
