@@ -10,6 +10,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>rocon_app_manager</depend>
+  <depend>rosbridge_server</depend>
+
   <export>
 
   </export>
