@@ -15,8 +15,13 @@ class JoystickTeleop():
             rospy.logerr("Param for joystick 'type' not set!")
             exit()
 
+<<<<<<< HEAD
         self._max_linear = 1.0  # m/s
         self._max_angular = 2.0  # rad/s
+=======
+        self._max_linear = 0.3 # m/s
+        self._max_angular = 0.6 # rad/s
+>>>>>>> cf65799849a505c75371ace0115a73e68c2e3e86
 
         self._twist = Twist()
 
