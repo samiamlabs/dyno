@@ -38,7 +38,7 @@ catkin_make_isolated --install --use-ninja
 source install_isolated/setup.bash
 ```
 
-## Add setup.bash to .bashrc
+## Add cartographer_ws setup.bash to .bashrc
 ```
 source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
 source ~/.bashrc
@@ -64,6 +64,12 @@ rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
 ## Build and install.
 ```
 catkin_make
+```
+
+## Add catkin_ws setup.bash to .bashrc
+```
+source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## Using
