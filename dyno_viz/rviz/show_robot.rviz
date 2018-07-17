@@ -34,7 +34,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.0299999993
         Value: Lines
@@ -47,7 +47,7 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
@@ -105,7 +105,7 @@ Visualization Manager:
       Visual Enabled: true
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 255; 255; 255
     Default Light: true
     Fixed Frame: base_footprint
     Frame Rate: 30
@@ -128,16 +128,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.650582731
+      Distance: 0.825774491
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.00526278792
-        Y: 0.0197426826
-        Z: 0.109535299
+        X: 0.00836664066
+        Y: -0.0147054754
+        Z: 0.0421446748
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
@@ -146,7 +146,7 @@ Visualization Manager:
       Pitch: 0.674797595
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.14859128
+      Yaw: 5.60676813
     Saved: ~
 Window Geometry:
   Displays:
