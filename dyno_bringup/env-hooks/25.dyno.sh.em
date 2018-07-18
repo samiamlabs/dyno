@@ -14,14 +14,14 @@
 #   The C Shell would read a script and use the first character to determine whether it was for the C Shell (a '#' hash) or the Bourne shell (a ':' colon).  #   Then the kernel got in on the act and added support for '#!/path/to/program' and the Bourne shell got '#' comments, and the colon convention went by the wayside.
 #   But if you come across a script that starts with a colon (Like this one), now you will know why. ~ Jonathan Leffler
 
-: ${DYNO_NAME:=Ann}
+: ${DYNO_NAME:=Dyno}
 : ${DYNO_SIMULATION:=true}
 : ${DYNO_BASE:=omnibot}
 : ${DYNO_RAPP_PACKAGE_WHITELIST:=[rocon_apps, dyno_rapps]}
 : ${DYNO_RAPP_PACKAGE_BLACKLIST:=[]}
 : ${DYNO_HUB_URI:=http://localhost:6380}
 : ${DYNO_CONCERT_DISABLE_ZEROCONF:=false}
-: ${DYNO_DEFAULT_RAPP:=dyno_common_rapps/waypoint_navigation}
+: ${DYNO_DEFAULT_RAPP:=dyno_common_rapps/exploration}
 : ${DYNO_PERFORMANCE:=false}
 : ${DYNO_FAKE_ODOM:=false}
 : ${DYNO_USE_ROS_CONTROL_FOR_BASE=false}
