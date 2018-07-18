@@ -4,4 +4,7 @@
 
   <!-- Show in Rviz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/gazebo_concert_client.rviz"/>
+
+  <!-- Start rqt -->
+  <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
 </launch>

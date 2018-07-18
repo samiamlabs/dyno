@@ -1,0 +1,10 @@
+%YAML 1.1
+---
+name: cartographer_load_state_2d
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/Localization
+depends_on:
+   ['dyno_capabilities/RobotStatePublisher',
+    'dyno_capabilities/MobileBase']
+launch_file: 'launch/cartographer_load_state_2d.launch.xml'

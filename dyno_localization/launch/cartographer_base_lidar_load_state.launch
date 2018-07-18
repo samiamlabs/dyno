@@ -1,5 +1,7 @@
 <launch>
+
   <arg name="configuration_basename" default="cartographer_base_lidar.lua"/>
+  <arg name="load_state_filename" default="$(find dyno_localization)/states/last_state.pbstream"/>
 
   <node
     name="cartographer_node"
@@ -8,12 +10,12 @@
     args="
           -configuration_directory
               $(find dyno_localization)/config/cartographer
-          -configuration_basename $(arg configuration_basename)"
+          -configuration_basename $(arg configuration_basename)
+          -load_state_filename $(arg load_state_filename)"
     output="screen">
 
     <!--
-    <remap from="points2" to="/hsrb/head_rgbd_sensor/depth_registered/rectified_points"/>
-    <remap from="scan" to="/hsrb/base_scan"/>
+    <remap from="points2" to="/rgbd_sensor/depth_registered/rectified_points"/>
     -->
   </node>
 

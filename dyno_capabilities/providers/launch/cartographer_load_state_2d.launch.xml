@@ -1,11 +1,13 @@
 <launch>
 
-  <include file="$(find dyno_hsr_localization)/launch/cartographer_base_lidar.launch"/>
+  <!-- Localization -->
+  <include file="$(find dyno_localization)/launch/cartographer_base_lidar_load_state.launch"/>
 
   <!-- Robot pose publisher -->
+  <!--
   <node pkg="robot_pose_publisher" name="robot_pose_publisher" type="robot_pose_publisher">
     <param name="is_stamped" value="true"/>
     <param name="base_frame" value="base_footprint"/>
   </node>
-
+   -->
 </launch>

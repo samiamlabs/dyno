@@ -1,0 +1,5 @@
+<launch>
+  <!-- Localization -->
+  <include file="$(find dyno_localization)/launch/cartographer_base_lidar_new.launch"/>
+
+</launch>

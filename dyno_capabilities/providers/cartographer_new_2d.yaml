@@ -1,10 +1,10 @@
 %YAML 1.1
 ---
-name: cartographer_mapping_2d
+name: cartographer_new_2d
 spec_version: 1
 spec_type: provider
 implements: dyno_capabilities/Localization
 depends_on:
    ['dyno_capabilities/RobotStatePublisher',
     'dyno_capabilities/MobileBase']
-launch_file: 'launch/cartographer_mapping_2d.launch.xml'
+launch_file: 'launch/cartographer_new_2d.launch.xml'
