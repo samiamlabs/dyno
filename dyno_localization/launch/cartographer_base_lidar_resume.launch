@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="configuration_basename" default="cartographer_base_lidar.lua"/>
+  <arg name="load_state_filename" default="$(find dyno_localization)/states/last_state.pbstream"/>
+  <arg name="save_state_filename" default="$(find dyno_localization)/states/last_state.pbstream"/>
+
+  <node
+    name="cartographer_node"
+    pkg="cartographer_ros"
+    type="cartographer_node"
+    args="
+          -configuration_directory
+              $(find dyno_localization)/config/cartographer
+          -configuration_basename $(arg configuration_basename)
+          -load_state_filename $(arg load_state_filename)
+          -save_state_filename $(arg save_state_filename)"
+    output="screen">
+
+    <!--
+    <remap from="points2" to="/rgbd_sensor/depth_registered/rectified_points"/>
+    -->
+  </node>
+
+  <!-- Default resolution = 0.05 -->
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros" type="cartographer_occupancy_grid_node" args="-resolution 0.05"/>
+
+  <!-- Save State service -->
+  <node name="save_cartograper_state" pkg="dyno_localization" type="save_state"/>
+
+
+</launch>

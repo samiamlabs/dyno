@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>dyno_teleop</name>
-  <version>0.0.1</version>
+  <version>0.0.0</version>
   <description>The dyno_teleop package</description>
 
   <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
