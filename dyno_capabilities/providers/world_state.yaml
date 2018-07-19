@@ -1,0 +1,7 @@
+%YAML 1.1
+---
+name: world_state
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/WorldState
+launch_file: 'launch/world_state.launch.xml'

@@ -59,6 +59,14 @@
       providers/diagnostics.yaml
     </capability_provider>
 
+    <capability_interface>
+      interfaces/WorldState.yaml
+    </capability_interface>
+
+    <capability_provider>
+      providers/world_state.yaml
+    </capability_provider>
+
 <!--
     <capability_provider>
       providers/cartographer_localization_3d.yaml

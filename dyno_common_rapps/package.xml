@@ -16,5 +16,6 @@
   <export>
     <rocon_app>rapps/exploration/exploration.rapp</rocon_app>
     <rocon_app>rapps/waypoint_navigation/waypoint_navigation.rapp</rocon_app>
+    <rocon_app>rapps/route_scheduler/route_scheduler.rapp</rocon_app>
   </export>
 </package>

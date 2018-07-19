@@ -9,5 +9,6 @@
     <param name="is_stamped" value="true"/>
     <param name="base_frame" value="base_footprint"/>
   </node>
-   -->
+  -->
+
 </launch>

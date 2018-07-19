@@ -1,0 +1,6 @@
+%YAML 1.1
+---
+name: WorldState
+spec_version: 1
+spec_type: interface
+description: 'This interface describes a world state with objects and locations'
