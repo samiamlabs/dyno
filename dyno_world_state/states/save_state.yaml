@@ -1,27 +1,27 @@
-Continue: !!python/object/new:__main__.LocationTuple
+Around the corner: !!python/object/new:__main__.LocationTuple
 - !!python/object/new:geometry_msgs.msg._PoseStamped.PoseStamped
   state:
   - !!python/object/new:std_msgs.msg._Header.Header
     state:
-    - 423
+    - 295
     - !!python/object/new:genpy.rostime.Time
       state:
-      - 1087
-      - 223000000
+      - 45
+      - 621000000
     - /map
   - &id001 !!python/object/new:geometry_msgs.msg._Pose.Pose
     state:
     - !!python/object/new:geometry_msgs.msg._Point.Point
       state:
-      - 1.0863398800867108
-      - 0.009434053722993385
-      - -1.6022938184589997e-12
+      - 3.077634137019926
+      - 1.1515985981314993
+      - -3.9891725290470276e-05
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
-      - 0.0002452099015077499
-      - -4.500168877793181e-06
-      - 0.07155884578731483
-      - 0.9974363495689537
+      - 0.0021185262383097677
+      - 0.00017007530054595824
+      - 0.6785757808253767
+      - 0.7345273259710627
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
   state:
   - !!python/object/new:std_msgs.msg._Header.Header
@@ -29,11 +29,11 @@ Continue: !!python/object/new:__main__.LocationTuple
     - 0
     - &id002 !!python/object/new:rospy.rostime.Time
       state:
-      - 1087
-      - 265000000
+      - 45
+      - 659000000
     - /map
   - location
-  - 1002
+  - 1006
   - 3
   - 0
   - *id001
@@ -66,16 +66,16 @@ Continue: !!python/object/new:__main__.LocationTuple
     - *id002
     - /map
   - location_labels
-  - 1003
+  - 1007
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
     state:
     - !!python/object/new:geometry_msgs.msg._Point.Point
       state:
-      - 1.0863398800867108
-      - 0.009434053722993385
-      - 0.1499999999983977
+      - 3.077634137019926
+      - 1.1515985981314993
+      - 0.1499601082747095
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
       - !!python/object/apply:numpy.core.multiarray.scalar
@@ -100,11 +100,11 @@ Continue: !!python/object/new:__main__.LocationTuple
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          6cWUKK5Rsj8=
+          OQjcY+S25T8=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          qGD3sv/q7z8=
+          xmVhDUaB5z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0
@@ -123,33 +123,33 @@ Continue: !!python/object/new:__main__.LocationTuple
   - false
   - []
   - []
-  - Continue
+  - Around the corner
   - ''
   - false
-Start: !!python/object/new:__main__.LocationTuple
+Corridor: !!python/object/new:__main__.LocationTuple
 - !!python/object/new:geometry_msgs.msg._PoseStamped.PoseStamped
   state:
   - !!python/object/new:std_msgs.msg._Header.Header
     state:
-    - 269
+    - 164
     - !!python/object/new:genpy.rostime.Time
       state:
-      - 1071
-      - 821000000
+      - 32
+      - 521000000
     - /map
   - &id004 !!python/object/new:geometry_msgs.msg._Pose.Pose
     state:
     - !!python/object/new:geometry_msgs.msg._Point.Point
       state:
-      - 1.0653910489807038e-05
-      - -0.0053761739870705205
-      - -8.405320710280773e-14
+      - 1.3459829517151822
+      - -0.03085298284049287
+      - -0.00010052232435575192
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
-      - -4.805880638177159e-11
-      - 5.158122127213347e-13
-      - -0.009216138229076215
-      - 0.9999575304962419
+      - 0.00032112789842810827
+      - -3.0749312760765895e-06
+      - 0.058167497522835634
+      - 0.998306786062956
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
   state:
   - !!python/object/new:std_msgs.msg._Header.Header
@@ -157,11 +157,11 @@ Start: !!python/object/new:__main__.LocationTuple
     - 0
     - !!python/object/new:rospy.rostime.Time
       state:
-      - 1071
-      - 911000000
+      - 32
+      - 601000000
     - /map
   - location
-  - 1000
+  - 1004
   - 3
   - 0
   - *id004
@@ -193,20 +193,134 @@ Start: !!python/object/new:__main__.LocationTuple
     - 0
     - !!python/object/new:rospy.rostime.Time
       state:
-      - 1071
-      - 913000000
+      - 32
+      - 603000000
     - /map
   - location_labels
-  - 1001
+  - 1005
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
     state:
     - !!python/object/new:geometry_msgs.msg._Point.Point
       state:
-      - 1.0653910489807038e-05
-      - -0.0053761739870705205
-      - 0.14999999999991595
+      - 1.3459829517151822
+      - -0.03085298284049287
+      - 0.14989947767564424
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!python/str "[\x05\x1C5!\u022D?"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!binary |
+          TmqLLiHy7z8=
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.0
+    - 0.0
+    - 0.24
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.5
+    - 0.2
+    - 0.2
+    - 1.0
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - Corridor
+  - ''
+  - false
+Start: !!python/object/new:__main__.LocationTuple
+- !!python/object/new:geometry_msgs.msg._PoseStamped.PoseStamped
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 64
+    - !!python/object/new:genpy.rostime.Time
+      state:
+      - 22
+      - 535000000
+    - /map
+  - &id005 !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - 0.0015024134303030451
+      - 0.007993892222891874
+      - -9.97617786990812e-14
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - -8.109987126439034e-11
+      - 9.650796953316325e-13
+      - -0.0082647610386641
+      - 0.9999658462792486
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - &id006 !!python/object/new:rospy.rostime.Time
+      state:
+      - 22
+      - 595000000
+    - /map
+  - location
+  - 1002
+  - 3
+  - 0
+  - *id005
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.33
+    - 0.33
+    - 0.01
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.4
+    - 0.4
+    - 0.7
+    - 0.9
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - ''
+  - ''
+  - false
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id006
+    - /map
+  - location_labels
+  - 1003
+  - 9
+  - 0
+  - !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - 0.0015024134303030451
+      - 0.007993892222891874
+      - 0.14999999999990024
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
       - !!python/object/apply:numpy.core.multiarray.scalar
@@ -218,11 +332,11 @@ Start: !!python/object/new:__main__.LocationTuple
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          UXtQIunfgr8=
+          7Gj2ch3tgL8=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          Wdlb76b/7z8=
+          3VzcX7j/7z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0

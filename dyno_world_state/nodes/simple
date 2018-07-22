@@ -202,9 +202,9 @@ class SimpleWorldState:
 
     def publish(self):
         location_array_msg = LocationArray()
-        location_msg = Location()
 
         for key in self.location_dict:
+            location_msg = Location()
             location_msg.name = key
             location_msg.pose = self.location_dict[key].pose_stamped.pose
             location_array_msg.locations.append(location_msg)

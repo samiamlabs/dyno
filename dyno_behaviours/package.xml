@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_behaviours</name>
+  <version>0.0.0</version>
+  <description>The dyno_behaviours package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+
+  <license>BSD</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>py_trees_ros</depend>
+  <depend>rqt_py_trees</depend>
+
+  <export>
+
+  </export>
+</package>

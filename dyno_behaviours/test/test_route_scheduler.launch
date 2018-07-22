@@ -1,0 +1,19 @@
+<launch>
+  <!-- Mock -->
+  <!-- <include file="$(find py_trees_ros)/launch/mock_robot.launch"/> -->
+  <node pkg="py_trees_ros" name="move_base" type="mock_component" args="move_base.MoveBase">
+      <param name="duration" value="5" />
+  </node>
+
+  <!-- World State -->
+  <include file="$(find dyno_world_state)/launch/simple.launch"/>
+
+  <!-- Web interface bridge -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+  <!-- Tree -->
+  <include file="$(find dyno_behaviours)/launch/route_scheduler.launch"/>
+
+  <!-- Viz -->
+  <node pkg="rqt_py_trees" name="rqt_py_trees" type="rqt_py_trees"/>
+</launch>
