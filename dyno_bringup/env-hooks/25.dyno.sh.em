@@ -21,7 +21,7 @@
 : ${DYNO_RAPP_PACKAGE_BLACKLIST:=[]}
 : ${DYNO_HUB_URI:=http://localhost:6380}
 : ${DYNO_CONCERT_DISABLE_ZEROCONF:=false}
-: ${DYNO_DEFAULT_RAPP:=dyno_common_rapps/exploration}
+: ${DYNO_DEFAULT_RAPP:=dyno_common_rapps/route_scheduler}
 : ${DYNO_PERFORMANCE:=false}
 : ${DYNO_FAKE_ODOM:=false}
 : ${DYNO_USE_ROS_CONTROL_FOR_BASE=false}
