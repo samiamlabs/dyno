@@ -40,7 +40,7 @@ source install_isolated/setup.bash
 
 ## Add cartographer_ws setup.bash to .bashrc
 ```
-echo source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
+echo source ~/cartographer_ws/install_isolated/setup.bash >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -74,7 +74,7 @@ source ~/.bashrc
 
 ## Using
 ```
-roslaunch dyno_gazebo brinup.launch
+roslaunch dyno_gazebo bringup.launch
 ```
 
 Open http://io.dynorobotics.se/ in browser
