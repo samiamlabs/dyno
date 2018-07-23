@@ -52,7 +52,7 @@ mkdir -p ~/catkin_ws/src
 ## Clone repository
 ```
 cd ~/catkin_ws/src
-git https://github.com/samiamlabs/dyno.git
+git clone https://github.com/samiamlabs/dyno.git
 ```
 
 ## Install deb dependencies.
