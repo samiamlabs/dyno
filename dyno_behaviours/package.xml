@@ -13,6 +13,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>py_trees_ros</depend>
+  <depend>py_trees</depend>
   <depend>rqt_py_trees</depend>
 
   <export>
