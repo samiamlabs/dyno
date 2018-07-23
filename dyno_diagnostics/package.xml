@@ -16,8 +16,7 @@
 
   <depend>rostest</depend>
   <depend>rosunit</depend>
-  <depend>diagnostic_common_diagnostics</depend>
-  <depend>diagnostic_updater</depend>
+  <depend>diagnostics</depend>
 
   <export>
 
