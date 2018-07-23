@@ -15,8 +15,6 @@
   <depend>rostest</depend>
   <depend>rosunit</depend>
 
-  <depend>sigverse_ros_package</depend>
-
   <export>
 
   </export>
