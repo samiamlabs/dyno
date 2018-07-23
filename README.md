@@ -40,7 +40,7 @@ source install_isolated/setup.bash
 
 ## Add cartographer_ws setup.bash to .bashrc
 ```
-source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
+echo source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
 source ~/.bashrc
 ```
 
