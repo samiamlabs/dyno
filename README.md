@@ -74,7 +74,13 @@ source ~/.bashrc
 
 ## Using
 ```
-roslaunch dyno_gazebo concert_client.launch
+roslaunch dyno_gazebo brinup.launch
 ```
 
 Open http://io.dynorobotics.se/ in browser
+
+## Optional dependencies
+To run a mecanum platform with ros_control:
+```
+git clone https://github.com/samiamlabs/mecanum_controller
+```
