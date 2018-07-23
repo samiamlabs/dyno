@@ -74,7 +74,7 @@ source ~/.bashrc
 
 ## Using
 ```
-roslaunch dyno_gazebo brinup.launch
+roslaunch dyno_gazebo bringup.launch
 ```
 
 Open http://io.dynorobotics.se/ in browser
