@@ -10,8 +10,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>hsr_description</depend>
-
   <depend>rostest</depend>
   <depend>rosunit</depend>
 
