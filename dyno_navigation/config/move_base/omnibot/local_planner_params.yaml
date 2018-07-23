@@ -50,12 +50,12 @@ EBandPlannerROS:
    xy_goal_tolerance: 0.03
    yaw_goal_tolerance: 0.05
 
-   max_vel_lin: 1.0
-   max_vel_th: 2.0
+   max_vel_lin: 0.3
+   max_vel_th: 0.6
 
-   max_acceleration: 1.0
-   max_translational_acceleration: 1.0
-   max_rotational_acceleration: 1.2
+   max_acceleration: 0.2
+   max_translational_acceleration: 0.2
+   max_rotational_acceleration: 0.4
 
    differential_drive: false
 
