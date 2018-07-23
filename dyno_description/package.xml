@@ -18,6 +18,9 @@
   <depend>robot_state_publisher</depend>
   <depend>rviz</depend>
 
+  <depend>gazebo_plugins</depend>
+  <depend>hector_gazebo_plugins</depend>
+
   <export>
 
   </export>

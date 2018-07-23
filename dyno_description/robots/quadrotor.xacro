@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<robot name="dyno_quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="use_ros_control_for_base" default="true"/>
+
+  <xacro:include filename="../urdf/materials/materials.xacro"/>
+  <xacro:include filename="../urdf/utils.urdf.xacro"/>
+  <!-- <xacro:include filename="../urdf/plugins.gazebo.xacro"/> -->
+
+  <!-- Set up definitions of parts of robot body -->
+  <xacro:include filename="../urdf/base/quadrotor_base.urdf.xacro"/>
+  <xacro:include filename="$(find dyno_description)/urdf/sensors/sonar_sensor.urdf.xacro" />
+  <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
+
+  <!-- Use macros to define the actual robot -->
+  <base/>
+
+  <!-- Sonar height sensor -->
+  <xacro:sonar_sensor name="sonar" parent="base_link" ros_topic="sonar_height" update_rate="10" min_range="0.03" max_range="3.0" field_of_view="${40*pi/180}" ray_count="3"> <origin xyz="-0.16 0.0 -0.012" rpy="0 ${90*pi/180} 0"/>
+  </xacro:sonar_sensor>
+
+  <!-- Laser Scanner -->
+  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.07" yaw_offset="0" parent="base_link"/>
+
+  <!-- Imu -->
+  <imu x_offset="0" y_offset="0" z_offset="0"/>
+
+</robot>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="base_gazebo">
+    <gazebo reference="base_link">
+    </gazebo>
+
+    <gazebo>
+
+      <xacro:if value="$(arg use_ros_control_for_base)">
+        <!-- <xacro:include filename="$(find hector_quadrotor_gazebo)/urdf/quadrotor_plugins.gazebo.xacro" /> -->
+      </xacro:if>
+
+      <xacro:unless value="$(arg use_ros_control_for_base)">
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+          <commandTopic>mobile_base_controller/cmd_vel</commandTopic>
+          <odometryTopic>/odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <odometryRate>20.0</odometryRate>
+          <robotBaseFrame>base_link</robotBaseFrame>
+        </plugin>
+
+      </xacro:unless>
+
+    </gazebo>
+
+  </xacro:macro>
+</robot>
