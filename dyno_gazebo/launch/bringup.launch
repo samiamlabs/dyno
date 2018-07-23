@@ -1,6 +1,6 @@
 <launch>
   <include file="$(find dyno_gazebo)/launch/simulation.launch"/>
-  <include file="$(find dyno_bringup)/launch/concert_client.launch"/>
+  <include file="$(find dyno_bringup)/launch/bringup.launch"/>
 
   <!-- Show in Rviz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/gazebo_concert_client.rviz"/>

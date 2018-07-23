@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find dyno_bringup)/launch/concert_client.launch">
+    <arg name="robot_name" value="$(env DYNO_BASE)"/>
+  </include>
+</launch>
