@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!-- Dyno Magni base -->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="forklift_base.gazebo.xacro"/>
+
+  <xacro:include filename="../wheels/forklift/support_wheel.urdf.xacro"/>
+  <xacro:include filename="../wheels/forklift/drive_wheel_assembly.urdf.xacro"/>
+
+  <!-- Base -->
+  <xacro:macro name="base">
+    <link name="base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/bases/forklift_base.stl" scale="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="dark"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0.2 0 0.14" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.15 0.2 0.3"/>
+        </geometry>
+        <material name="orange"/>
+      </collision>
+
+      <inertial>
+        <origin xyz="0.1 0 0" rpy="0 0 0"/>
+        <mass value="1.0"/>
+        <box_inertia m="1.0" x="0.3" y="0.25" z="0.1"/>
+      </inertial>
+    </link>
+
+    <!-- Base footprint -->
+    <link name="base_footprint"/>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <origin xyz="0 0 0.25" rpy="0 0 0"/>
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+    </joint>
+
+    <!-- Fork -->
+    <joint name="fork_joint" type="prismatic">
+      <origin xyz="0.106 0 0" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="fork_link"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1000.0" lower="0" upper="1.0" velocity="0.05"/>
+    </joint>
+
+    <link name="fork_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/bases/forklift_fork.stl" scale="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+
+      <collision>
+        <origin xyz="-0.15 0 -0.004" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.24 0.1 0.008"/>
+        </geometry>
+        <material name="orange"/>
+      </collision>
+
+      <inertial>
+        <origin xyz="-0.16 0 0" rpy="0 0 0"/>
+        <mass value="0.2"/>
+        <box_inertia m="0.2" x="0.23" y="0.1" z="0.008"/>
+      </inertial>
+    </link>
+
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <xacro:simple_transmission name="fork_joint" interface="PositionJointInterface"/>
+    </xacro:if>
+
+    <!-- Macros -->
+    <xacro:property name="support_wheel_separation" value="0.217"/>
+
+    <support_wheel name="support_wheel_right" separation="${support_wheel_separation}" reflect="1.0" parent="base_link"/>
+    <support_wheel name="support_wheel_left"  separation="${support_wheel_separation}" reflect="-1.0" parent="base_link"/>
+
+    <drive_wheel_assembly/>
+
+
+    <!-- Gazebo extentions -->
+    <base_gazebo/>
+  </xacro:macro>
+
+</robot>

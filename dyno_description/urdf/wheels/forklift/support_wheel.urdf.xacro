@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="support_wheel.gazebo.xacro"/>
+
+  <xacro:macro name="support_wheel" params="name separation reflect parent">
+
+    <xacro:property name="radius" value="0.025"/>
+    <xacro:property name="width" value="0.011"/>
+    <xacro:property name="mass" value="0.1"/>
+
+    <link name="${name}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/wheels/forklift_support_wheel.stl" scale="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${width}"/>
+        </geometry>
+        <material name="orange"/>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${mass}"/>
+        <cylinder_inertia m="${mass}" r="${radius}" h="${width}" />
+      </inertial>
+
+    </link>
+
+    <joint name="${name}_joint" type="continuous">
+      <origin xyz="0 ${-separation / 2 * reflect} 0" rpy="${pi/2 * reflect} 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="10000" velocity="10000"/>
+    </joint>
+
+    <!-- Transmission -->
+
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <xacro:simple_transmission name="${suffix}_steer_joint" interface="VelocityJointInterface"/>
+    </xacro:if>
+
+    <!-- Gazebo extensions -->
+    <drive_wheel_gazebo name="${name}"/>
+
+  </xacro:macro>
+</robot>

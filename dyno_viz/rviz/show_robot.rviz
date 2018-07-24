@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1/Links1
+        - /RobotModel1/Links1/fork_link1
       Splitter Ratio: 0.5
     Tree Height: 736
   - Class: rviz/Selection
@@ -62,7 +63,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
@@ -73,26 +73,36 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        drive_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fork_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         imu_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        wheel_front_left_link:
+        leap_motion_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_front_right_link:
+        steer_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_rear_left_link:
+        support_wheel_left_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_rear_right_link:
+        support_wheel_right_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -128,25 +138,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.825774491
+      Distance: 0.787096739
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.00836664066
-        Y: -0.0147054754
-        Z: 0.0421446748
+        X: 0.14916499
+        Y: -0.0175180361
+        Z: 0.408971548
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.674797595
+      Pitch: 0.189798057
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.60676813
+      Yaw: 3.98675585
     Saved: ~
 Window Geometry:
   Displays:

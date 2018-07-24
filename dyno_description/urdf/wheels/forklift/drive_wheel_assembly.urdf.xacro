@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!-- Guidebot differential drive base -->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="drive_wheel_assembly.gazebo.xacro"/>
+
+  <!-- Wheel Assembly -->
+  <xacro:macro name="drive_wheel_assembly">
+
+    <xacro:property name="dynamixel_effort" value="1.5"/>
+    <xacro:property name="dynamixel_velocity" value="4.0"/>
+
+    <!-- Wheel characteristics -->
+    <xacro:property name="wheel_radius" value="0.033"/>
+    <xacro:property name="wheel_width" value="0.0178"/>
+
+    <!-- Wheel-->
+    <joint name="drive_wheel_joint" type="continuous">
+      <origin xyz="0 0 -0.0453" rpy="${-M_PI/2} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="${dynamixel_effort*500}" velocity="${dynamixel_velocity*100}"/>
+      <dynamics damping="0.0" friction="0.0"/>
+      <parent link="steer_link"/>
+      <child link="drive_wheel_link"/>
+    </joint>
+
+    <link name="drive_wheel_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <cylinder_inertia m="0.1" r="${wheel_radius}" h="${wheel_width}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/wheels/forklift_drive_wheel.stl" scale="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="DarkGrey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Wheel Steer -->
+    <joint name="steer_joint" type="revolute">
+      <axis xyz="0 0 1"/>
+      <limit lower="${-90*M_PI/180.0}" upper="${90*M_PI/180.0}" effort="${dynamixel_effort}" velocity="${dynamixel_velocity}"/>
+      <dynamics damping="0.0" friction="0.0"/>
+      <origin xyz="0.2537 0 0.053" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="steer_link"/>
+    </joint>
+
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <xacro:simple_transmission name="steer_joint" interface="PositionJointInterface"/>
+    </xacro:if>
+
+    <link name="steer_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <cylinder_inertia m="0.1" r="0.015" h="0.1"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/bases/forklift_steer.stl" scale="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="light_blue"/>
+      </visual>
+      <!--
+      <collision>
+        <origin xyz="0 0 0.0015" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="0.01" radius="0.003"/>
+        </geometry>
+      </collision>
+       -->
+    </link>
+
+  </xacro:macro>
+
+</robot>

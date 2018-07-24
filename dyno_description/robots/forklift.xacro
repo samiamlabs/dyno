@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno_forklift" >
+  <xacro:arg name="use_ros_control_for_base" default="true"/>
+
+  <xacro:include filename="../urdf/materials/materials.xacro"/>
+  <xacro:include filename="../urdf/utils.urdf.xacro"/>
+  <xacro:include filename="../urdf/plugins.gazebo.xacro"/>
+
+  <!-- Set up definitions of parts of robot body -->
+  <xacro:include filename="../urdf/base/forklift_base.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/leap_motion.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/vive_tracker.urdf.xacro"/>
+  <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
+
+  <!-- Use macros to define the actual robot -->
+  <base/>
+
+  <!-- Laser Scanner -->
+  <lds_lfcd name="base_scan" x_offset="0.11" y_offset="0" z_offset="0.41" yaw_offset="0" parent="base_link"/>
+
+  <!-- Vive Tracker -->
+  <!-- <vive_tracker name="vive_tracker" x_offset="0.13" y_offset="0" z_offset="0.391" yaw_offset="0" parent="base_link"/> -->
+
+  <!-- Leap Motion -->
+  <leap_motion name="leap_motion" x_offset="-0.025" y_offset="0" z_offset="0.08" yaw_offset="0" parent="fork_link"/>
+
+  <!-- Imu -->
+  <imu x_offset="0" y_offset="0" z_offset="0"/>
+
+</robot>
