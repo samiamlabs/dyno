@@ -13,4 +13,8 @@
     <include file="$(find dyno_control)/launch/four_wheel_steering_controllers.launch"/>
   </group>
 
+  <group if="$(eval base == 'forklift')">
+    <include file="$(find dyno_control)/launch/tricycle_controllers.launch"/>
+  </group>
+
 </launch>

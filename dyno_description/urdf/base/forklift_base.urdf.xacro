@@ -27,10 +27,11 @@
         <material name="orange"/>
       </collision>
 
+      <!-- Set high weight and low intertia for gazebot simulation -->
       <inertial>
-        <origin xyz="0.1 0 0" rpy="0 0 0"/>
-        <mass value="1.0"/>
-        <box_inertia m="1.0" x="0.3" y="0.25" z="0.1"/>
+        <origin xyz="0.13 0 0" rpy="0 0 0"/>
+        <mass value="10.0"/>
+        <box_inertia m="0.1" x="0.3" y="0.25" z="0.1"/>
       </inertial>
     </link>
 
@@ -38,7 +39,7 @@
     <link name="base_footprint"/>
 
     <joint name="base_footprint_joint" type="fixed">
-      <origin xyz="0 0 0.25" rpy="0 0 0"/>
+      <origin xyz="0 0 0.025" rpy="0 0 0"/>
       <parent link="base_footprint"/>
       <child link="base_link"/>
     </joint>
@@ -71,8 +72,8 @@
 
       <inertial>
         <origin xyz="-0.16 0 0" rpy="0 0 0"/>
-        <mass value="0.2"/>
-        <box_inertia m="0.2" x="0.23" y="0.1" z="0.008"/>
+        <mass value="0.02"/>
+        <box_inertia m="0.002" x="0.23" y="0.1" z="0.008"/>
       </inertial>
     </link>
 

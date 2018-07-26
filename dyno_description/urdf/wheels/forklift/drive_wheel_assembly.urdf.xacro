@@ -24,6 +24,10 @@
       <child link="drive_wheel_link"/>
     </joint>
 
+    <xacro:if value="$(arg use_ros_control_for_base)">
+      <xacro:simple_transmission name="drive_wheel_joint" interface="VelocityJointInterface"/>
+    </xacro:if>
+
     <link name="drive_wheel_link">
       <inertial>
         <mass value="0.1"/>

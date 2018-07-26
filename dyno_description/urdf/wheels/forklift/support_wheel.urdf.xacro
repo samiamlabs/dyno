@@ -46,7 +46,7 @@
     <!-- Transmission -->
 
     <xacro:if value="$(arg use_ros_control_for_base)">
-      <xacro:simple_transmission name="${suffix}_steer_joint" interface="VelocityJointInterface"/>
+      <xacro:simple_transmission name="${name}_joint" interface="EffortJointInterface"/>
     </xacro:if>
 
     <!-- Gazebo extensions -->
