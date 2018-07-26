@@ -8,7 +8,9 @@
 
   <!-- Set up definitions of parts of robot body -->
   <xacro:include filename="../urdf/base/diff_drive_base.urdf.xacro"/>
+
   <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
+
   <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
 
   <!-- Use macros to define the actual robot -->

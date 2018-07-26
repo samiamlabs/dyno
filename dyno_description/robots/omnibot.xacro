@@ -12,13 +12,17 @@
   <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
   <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
 
+  <xacro:include filename="../urdf/manipulators/open_manipulator.urdf.xacro"/>
+
   <!-- Use macros to define the actual robot -->
   <base/>
 
   <!-- Laser Scanner -->
-  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.1" yaw_offset="0" parent="base_link"/>
+  <lds_lfcd name="base_scan" x_offset="0.15" y_offset="0" z_offset="0.1" yaw_offset="0" parent="base_link"/>
 
   <!-- Imu -->
   <imu x_offset="0" y_offset="0" z_offset="0"/>
+
+  <open_manipulator x_offset="0.08" y_offset="0" z_offset="0.07"/>
 
 </robot>
