@@ -9,6 +9,7 @@
       pkg="controller_manager" type="spawner" output="screen"
       args="--timeout 120
             joint_state_controller
-            mobile_base_controller"
+            mobile_base_controller
+            fork_position_controller"
             />
 </launch>

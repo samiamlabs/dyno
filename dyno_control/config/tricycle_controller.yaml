@@ -30,3 +30,9 @@ mobile_base_controller:
       max_acceleration       : !degrees 120.0
       has_jerk_limits        : false
       max_jerk               : !degrees 600.0
+
+# Position Controllers ---------------------------------------
+fork_position_controller:
+  type: position_controllers/JointPositionController
+  joint: fork_joint
+  pid: {p: 20, i: 0.01, d: 1.0}
