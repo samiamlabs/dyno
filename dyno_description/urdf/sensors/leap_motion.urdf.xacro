@@ -14,9 +14,9 @@
       <visual>
         <origin xyz="0 0 0.0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://dyno_description/meshes/sensors/leap_motion.stl" scale="0.01 0.01 0.01"/>
+          <mesh filename="package://dyno_description/meshes/sensors/leap_motion.dae" scale="0.01 0.01 0.01"/>
         </geometry>
-        <material name="grey"/>
+        <!-- <material name="grey"/> -->
       </visual>
       <!--
       <collision>

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno_diff_drive" >
+  <xacro:arg name="use_ros_control_for_base" default="true"/>
 
   <xacro:include filename="../urdf/materials/materials.xacro"/>
   <xacro:include filename="../urdf/utils.urdf.xacro"/>
@@ -11,7 +12,7 @@
 
   <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
 
-  <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
+  <!-- <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/> -->
 
   <!-- Use macros to define the actual robot -->
   <base/>
@@ -20,6 +21,6 @@
   <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.17" yaw_offset="0" parent="base_link"/>
 
   <!-- Imu -->
-  <imu x_offset="0" y_offset="0" z_offset="0"/>
+  <!-- <imu x_offset="0" y_offset="0" z_offset="0"/> -->
 
 </robot>

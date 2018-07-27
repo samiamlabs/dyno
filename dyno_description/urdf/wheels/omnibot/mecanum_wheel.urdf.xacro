@@ -17,7 +17,7 @@
             <mesh filename="package://dyno_description/meshes/wheels/mecanum_wheel.stl" scale="0.001 0.001 -0.001"/>
           </xacro:if>
         </geometry>
-        <material name="grey"/>
+        <material name="dark"/>
       </visual>
 
       <collision>

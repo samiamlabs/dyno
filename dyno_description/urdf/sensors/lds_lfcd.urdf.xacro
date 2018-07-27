@@ -15,6 +15,7 @@
         <origin xyz="0 0 0.0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://dyno_description/meshes/sensors/lds.stl" scale="0.001 0.001 0.001"/>
+          <!-- <cylinder length="0.0315" radius="0.055"/> -->
         </geometry>
         <material name="dark"/>
       </visual>

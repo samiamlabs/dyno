@@ -21,7 +21,7 @@
         <geometry>
           <mesh filename="package://dyno_description/meshes/bases/omnibot_base.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="blue"/>
+        <material name="light_blue"/>
       </visual>
 
       <collision>

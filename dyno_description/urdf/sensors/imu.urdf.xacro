@@ -6,7 +6,19 @@
   <xacro:include filename="imu.gazebo.xacro"/>
   <xacro:macro name="imu" params="x_offset y_offset z_offset">
 
-    <link name="imu_link"/>
+    <link name="imu_link">
+      <visual>
+        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="0.001" radius="0.001"/>
+        </geometry>
+      </visual>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.001"/>
+        <box_inertia m="0.001" x="0.01" y="0.01" z="0.002"/>
+      </inertial>
+    </link>
 
     <joint name="imu_joint" type="fixed">
       <origin xyz="${x_offset} ${y_offset} ${z_offset}" rpy="0 0 0"/>
