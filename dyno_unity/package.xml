@@ -12,6 +12,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>controller_manager</depend>
+
   <export>
 
   </export>

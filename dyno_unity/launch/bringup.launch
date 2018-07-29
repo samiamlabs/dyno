@@ -1,10 +1,12 @@
 <launch>
-  <include file="$(find dyno_description)/launch/load_robot_description.launch"/>
-
-	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
-		<param name="port" value="9090"/>
-	</include>
+  <include file="$(find dyno_bringup)/launch/bringup.launch"/>
 
 	<node name="file_server" pkg="file_server" type="file_server" output="screen"/>
+
+  <!-- Config -->
+  <rosparam file="$(find dyno_unity)/config/joint_limits.yaml" command="load"/>
+
+  <!-- Driver/intreface -->
+  <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
 
 </launch>
