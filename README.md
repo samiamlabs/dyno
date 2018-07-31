@@ -4,6 +4,7 @@
 ```
 sudo apt-get update
 sudo apt-get install -y python-wstool python-rosdep ninja-build
+```
 
 
 ## Create a new workspace in 'catkin_ws'
@@ -46,3 +47,9 @@ To run a mecanum platform with ros_control:
 ```
 git clone https://github.com/samiamlabs/mecanum_controller
 ```
+To run a tricycle platform with ros_control:
+```
+git clone https://github.com/samiamlabs/tricycle_controller.git
+```
+
+See full usage documentation here: https://dyno-docs.readthedocs.io
