@@ -103,7 +103,7 @@ public:
     position_joint_limits_interface_.registerHandle(steer_handle);
 
 
-    if (getJointLimits("steer_joint", nh, limits) == 0) {
+    if (getJointLimits("fork_joint", nh, limits) == 0) {
       ROS_ERROR("Fork joint limits not specified in params. Aborting!");
       throw;
     }

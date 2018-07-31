@@ -1,4 +1,9 @@
 <launch>
+  <arg name="use_sim_time" default="true"/>
+
+  <!-- set use_sim_time flag -->
+  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+
   <include file="$(find dyno_bringup)/launch/bringup.launch"/>
 
 	<node name="file_server" pkg="file_server" type="file_server" output="screen"/>
@@ -8,5 +13,11 @@
 
   <!-- Driver/intreface -->
   <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
+
+  <!-- Show in Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/unity_concert_client.rviz"/>
+
+  <!-- Start rqt -->
+  <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
 
 </launch>
