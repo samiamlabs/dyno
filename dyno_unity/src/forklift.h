@@ -71,6 +71,17 @@ public:
                                                  &fork_joint_.position_command);
     jnt_pos_interface_.registerHandle(pos_handle);
 
+    // Support wheel joint states
+    support_wheel_state_ = 0;
+    state_handle = hardware_interface::JointStateHandle(
+      "support_wheel_left_joint", &support_wheel_state_, &support_wheel_state_, &support_wheel_state_);
+    jnt_state_interface_.registerHandle(state_handle);
+
+    state_handle = hardware_interface::JointStateHandle(
+      "support_wheel_right_joint", &support_wheel_state_, &support_wheel_state_, &support_wheel_state_);
+
+    jnt_state_interface_.registerHandle(state_handle);
+
     registerInterface(&jnt_state_interface_);
     registerInterface(&jnt_vel_interface_);
     registerInterface(&jnt_pos_interface_);
@@ -111,6 +122,7 @@ public:
     joint_limits_interface::PositionJointSoftLimitsHandle fork_handle(
         joint_handle, limits, soft_limits);
     position_joint_limits_interface_.registerHandle(fork_handle);
+
   }
 
   ros::Time getTime() const { return ros::Time::now(); }
@@ -190,6 +202,8 @@ private:
 
     ForkJoint() : position(0), velocity(0), effort(0), position_command(0) {}
   } fork_joint_;
+
+  double support_wheel_state_;
 
   bool running_;
 

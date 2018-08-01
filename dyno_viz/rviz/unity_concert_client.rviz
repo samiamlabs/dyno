@@ -8,8 +8,7 @@ Panels:
         - /Status1
         - /RobotModel1/Links1
         - /RobotModel1/Links1/base_scan_link1
-        - /Local Path1
-        - /Global Path1
+        - /Vive Tracker1/Status1
       Splitter Ratio: 0.5
     Tree Height: 736
   - Class: rviz/Selection
@@ -203,6 +202,30 @@ Visualization Manager:
       Topic: /move_base/TebLocalPlannerROS/global_plan
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.300000012
+      Head Radius: 0.100000001
+      Name: Vive Tracker
+      Shaft Length: 1
+      Shaft Radius: 0.0500000007
+      Shape: Arrow
+      Topic: /vive_tracker
+      Unreliable: false
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /world_state/markers
+      Name: MarkerArray
+      Namespaces:
+        location: true
+        location_labels: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -228,25 +251,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.66826248
+      Distance: 5.17430592
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.61109364
-        Y: -0.284862667
-        Z: 0.191007763
+        X: -0.464345425
+        Y: 0.816755593
+        Z: -0.0711435005
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.56979632
+      Pitch: 0.404797435
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.19358206
+      Yaw: 0.765392005
     Saved: ~
 Window Geometry:
   Displays:
@@ -264,5 +287,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 956
-  X: 0
+  X: 960
   Y: 38
