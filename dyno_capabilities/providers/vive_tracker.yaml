@@ -1,0 +1,10 @@
+%YAML 1.1
+---
+name: vive_tracker
+spec_version: 1
+spec_type: provider
+implements: dyno_capabilities/Localization
+depends_on:
+   ['dyno_capabilities/RobotStatePublisher',
+    'dyno_capabilities/MobileBase']
+launch_file: 'launch/vive_tracker.launch.xml'

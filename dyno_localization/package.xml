@@ -17,6 +17,7 @@
 
   <depend>move_base</depend>
   <depend>twist_mux</depend>
+  <depend>message_to_tf</depend>
 
   <depend>base_local_planner</depend>
   <depend>eband_local_planner</depend>

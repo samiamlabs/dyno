@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /RobotModel1/Links1
         - /RobotModel1/Links1/base_scan_link1
-        - /Vive Tracker1/Status1
       Splitter Ratio: 0.5
     Tree Height: 736
   - Class: rviz/Selection
@@ -156,11 +155,31 @@ Visualization Manager:
       Unreliable: false
       Use Timestamp: false
       Value: true
+    - Alpha: 0.699999988
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: false
+      Name: Local Costmap
+      Topic: /move_base/local_costmap/costmap
+      Unreliable: false
+      Use Timestamp: false
+      Value: false
+    - Alpha: 0.699999988
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: false
+      Name: Global Costmap
+      Topic: /move_base/global_costmap/costmap
+      Unreliable: false
+      Use Timestamp: false
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
       Color: 255; 0; 0
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.300000012
       Head Length: 0.200000003
       Length: 0.300000012
@@ -178,7 +197,7 @@ Visualization Manager:
       Shaft Length: 0.100000001
       Topic: /move_base/TebLocalPlannerROS/local_plan
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
@@ -202,12 +221,22 @@ Visualization Manager:
       Topic: /move_base/TebLocalPlannerROS/global_plan
       Unreliable: false
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /move_base/TebLocalPlannerROS/teb_markers
+      Name: TEB
+      Namespaces:
+        PointObstacles: true
+        RobotFootprintModel: false
+        TebContainer: true
+      Queue Size: 100
+      Value: true
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.100000001
       Class: rviz/Pose
       Color: 255; 25; 0
-      Enabled: true
+      Enabled: false
       Head Length: 0.300000012
       Head Radius: 0.100000001
       Name: Vive Tracker
@@ -216,16 +245,29 @@ Visualization Manager:
       Shape: Arrow
       Topic: /vive_tracker
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /world_state/markers
       Name: MarkerArray
       Namespaces:
-        location: true
-        location_labels: true
+        {}
       Queue Size: 100
       Value: true
+    - Class: rviz/TF
+      Enabled: false
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        {}
+      Update Interval: 0
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -251,25 +293,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.17430592
+      Distance: 7.59526157
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.464345425
-        Y: 0.816755593
-        Z: -0.0711435005
+        X: -1.51122928
+        Y: 0.452344775
+        Z: -1.35605848
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.404797435
+      Pitch: 0.579797506
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.765392005
+      Yaw: 1.68538904
     Saved: ~
 Window Geometry:
   Displays:

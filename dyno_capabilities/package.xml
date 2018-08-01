@@ -43,6 +43,10 @@
       providers/cartographer_resume_2d.yaml
     </capability_provider>
 
+    <capability_provider>
+      providers/vive_tracker.yaml
+    </capability_provider>
+
     <capability_interface>
       interfaces/Navigation.yaml
     </capability_interface>
