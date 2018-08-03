@@ -3,6 +3,7 @@
 # License: BSD
 #   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
 #
+
 import rospy
 
 # Because of transformations
@@ -20,9 +21,13 @@ class ViveTrackerLocalizationBroadcaster:
         self.transform_listener = tf.TransformListener()
         self.transform_broadcaster = tf.TransformBroadcaster()
 
-        rospy.Subscriber('/vive_tracker',
-                         geometry_msgs.msg.PoseStamped,
-                         self.handle_vive_tracker_pose)
+        # rospy.Subscriber('/vive_tracker',
+        #                  geometry_msgs.msg.PoseStamped,
+        #                  self.handle_vive_tracker_pose)
+
+        rate = rospy.Rate(10) # 10hz
+        while not rospy.is_shutdown():
+            
 
         rospy.spin()
 
@@ -47,6 +52,6 @@ class ViveTrackerLocalizationBroadcaster:
 
 if __name__ == '__main__':
     try:
-        ViveTrackerLocalizationBroadcaster()
+        RobotPosePublisher()
     except rospy.ROSInterruptException:
         pass

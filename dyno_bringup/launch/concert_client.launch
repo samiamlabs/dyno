@@ -12,7 +12,7 @@
     - pings the gateway to spin fast whenever flips are required
 
  -->
- 
+
 <launch>
 
   <include file="$(find dyno_description)/launch/load_robot_description.launch"/>
@@ -97,9 +97,10 @@
       <rosparam command="load" file="$(find rocon_gateway)/param/default.yaml" />
       <rosparam command="load" file="$(find rocon_gateway)/param/default_blacklist.yaml" />
       <rosparam command="load" file="$(find rocon_app_manager)/param/advertisements.yaml" />
-      <rosparam param="hub_whitelist" subst_value="True">$(arg hub_whitelist)</rosparam>
+      <!-- <rosparam param="hub_whitelist" subst_value="True">$(arg hub_whitelist)</rosparam> -->
+      <rosparam param="hub_whitelist" subst_value="True">["$(arg hub_uri)"]</rosparam>
       <param name="hub_uri" value="$(arg hub_uri)"/>
-      <param name="firewall" value="true"/>  <!-- nothing allowed in! -->
+      <param name="firewall" value="false"/>  <!-- nothing allowed in if true! -->
       <param name="name" value="$(arg robot_name)"/>
       <param name="watch_loop_period" value="$(arg gateway_watch_loop_period)"/>
       <param name="disable_uuids" value="false" if="$(arg gateway_uuids)"/>
@@ -132,6 +133,10 @@
 
   <!-- ***************************** Interactions ******************************* -->
 
-  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+  <!-- TODO: add arg  -->
+  <arg name="rosbridge_port" default="9090"/>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="port" value="$(arg rosbridge_port)"/>
+  </include>
 
 </launch>

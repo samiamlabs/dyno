@@ -1,5 +1,11 @@
 <launch>
+  <arg name="robot_name" default="dyno_client"/>
+  <arg name="zeroconf" default="false"/>
+  <arg name="rosbridge_port" default="9090"/>
+
   <include file="$(find dyno_bringup)/launch/concert_client.launch">
-    <arg name="robot_name" value="$(env DYNO_BASE)"/>
+    <arg name="robot_name" value="$(arg robot_name)"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+    <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
   </include>
 </launch>

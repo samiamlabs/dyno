@@ -1,0 +1,25 @@
+<launch>
+  <arg name="use_sim_time" default="true"/>
+
+  <arg name="robot_name" default="dyno_client"/>
+  <arg name="zeroconf" default="false"/>
+  <arg name="rosbridge_port" default="9090"/>
+
+  <!-- set use_sim_time flag -->
+  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+
+  <include file="$(find dyno_bringup)/launch/bringup.launch">
+    <arg name="robot_name" value="$(arg robot_name)"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+    <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
+  </include>
+
+	<node name="file_server" pkg="file_server" type="file_server" output="screen"/>
+
+  <!-- Config -->
+  <rosparam file="$(find dyno_unity)/config/joint_limits.yaml" command="load"/>
+
+  <!-- Driver/intreface -->
+  <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
+
+</launch>

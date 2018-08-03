@@ -2,3 +2,5 @@
 # implementation for an ancestor rapp specification:
 preferred:
   'dyno_common_rapps/waypoint_navigation': 'dyno_common_rapps/waypoint_navigation'
+  'dyno_common_rapps/route_scheduler': 'dyno_common_rapps/route_scheduler'
+  'dyno_common_rapps/exploration': 'dyno_common_rapps/exploration'

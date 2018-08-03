@@ -1,0 +1,114 @@
+<launch>
+  <!-- ******************************* Arguments ******************************* -->
+
+  <!-- Concert -->
+  <arg name="concert_name" default="Dyno Concert" doc="concert name"/>
+  <arg name="concert_icon" default="rocon_icons/rocon.png" doc="concert icon path in resource pair. e.g) rocon_icons/rocon.png"/>
+  <arg name="concert_description" default="Pirates in concert." doc="Describe concert"/>
+
+  <!-- Hub -->
+  <arg name="hub_port"                    default="6380" doc="port for rocon hub redis"/>
+
+  <!-- Gateways -->
+  <arg name="hub_uri"                         default="$(env DYNO_HUB_URI)"      doc="where the gateway can find a hub if zeroconf is disabled"/>
+  <arg name="gateway_watch_loop_period"   default="5" doc="polling period for multimaster advertising/flipping"/>
+  <arg name="gateway_uuids"               default="false" doc="postfix unique id's to the concert gateway name"/>
+  <arg name="gateway_network_interface" default="$(optenv GATEWAY_NETWORK_INTERFACE)" doc="If you have multiple network interfaces and want to lock it on one (e.g. 'eth0')"/>
+  <arg name="gateway_gone_timeout" default="30" doc="how long before a remote gateway (i.e. robot) is flagged as missing ( should be greater than remote gateway periods ) "/>
+
+  <!-- Zeroconf -->
+  <arg name="zeroconf" default="true" doc="Required to auto-configure both hub and gateway, use manual uri settings otherwise."/>
+
+  <!-- Interactions -->
+  <arg name="interactions_list" default="[]"/>  <!-- list of resource names pointing to yaml interaction configurations, e.g. [rocon_app_manager_tutorials/pairing] -->
+
+  <!-- Rosbridge -->
+  <arg name="rosbridge"         default="false" doc="enable/disable rosbridge websocket communications"/>
+  <arg name="rosbridge_address" default="localhost" doc="rosbridge address for rocon_interactions"/>
+  <arg name="rosbridge_port"    default="9090" doc="rosbridge port for rocon_interactions"/>
+  <arg name="webserver_address" default="webapp.robotconcert.org" doc="webserver address for webapps in rocon_interactions"/>
+
+  <!-- Connection Cache -->
+  <arg name="connection_cache_spin_frequency" default="0.1"/>
+
+  <group ns="concert">
+    <!-- ******************************** Master ******************************* -->
+    <include file="$(find rocon_master_info)/launch/rocon_master_info.launch">
+      <arg name="name" value="$(arg concert_name)" />
+      <arg name="icon" value="$(arg concert_icon)" />
+      <arg name="description" value="$(arg concert_description)" />
+    </include>
+
+    <!-- ****************************** Conductor ****************************** -->
+    <node pkg="concert_conductor" type="conductor.py" name="conductor" output="screen">
+      <remap from="conductor/flip" to="gateway/flip"/>
+      <remap from="conductor/hub_shutdown" to="hub/shutdown"/>
+      <remap from="conductor/gateway_info" to="gateway/gateway_info"/>
+      <remap from="conductor/remote_gateway_info" to="gateway/remote_gateway_info"/>
+      <remap from="conductor/gateway_shutdown" to="gateway/shutdown"/>
+      <remap from="conductor/gateway_pull" to="gateway/pull"/>
+    </node>
+
+    <!-- ****************************** Conductor Graph to String ****************************** -->
+    <node pkg="concert_utilities" type="conductor_graph_to_string.py" name="concert_conductor_graph_to_string"/>
+
+    <!-- **************************** Interactions ***************************** -->
+    <!--
+    <node pkg="rocon_interactions" type="interactions_manager.py" name="interactions">
+      <rosparam param="interactions" subst_value="true">$(arg interactions_list)</rosparam>
+      <param name="rosbridge_address" value="$(arg rosbridge_address)"/>
+      <param name="rosbridge_port" value="$(arg rosbridge_port)"/>
+      <param name="webserver_address" value="$(arg webserver_address)"/>
+      <param name="rapp_manager" value="false"/>
+      <param name="interactions_list" value="$(arg interactions_list)"/>
+    </node>
+    -->
+
+    <!-- ******************************** Hub ********************************** -->
+    <include file="$(find rocon_hub)/launch/hub.launch">
+      <arg name="hub_name" value="$(arg concert_name)" />
+      <arg name="hub_port" value="$(arg hub_port)" />
+      <arg name="gateway_gone_timeout" value="$(arg gateway_gone_timeout)"/>
+      <arg name="zeroconf" value="$(arg zeroconf)"/>
+    </include>
+
+    <!-- ****************************** Connection Cache ************************* -->
+    <include file="$(find rocon_python_comms)/launch/connection_cache.launch">
+      <arg name="spin_freq" value="$(arg connection_cache_spin_frequency)"/>
+    </include>
+
+    <!-- ******************************** Gateway ******************************** -->
+    <node pkg="rocon_gateway" type="gateway.py" name="gateway">
+      <rosparam command="load" file="$(find rocon_gateway)/param/default.yaml"/>
+      <rosparam command="load" file="$(find rocon_gateway)/param/default_blacklist.yaml"/>
+      <rosparam param="hub_whitelist" subst_value="True">["$(arg hub_uri)"]</rosparam>
+      <param name="hub_uri" value="$(arg hub_uri)"/>
+      <param name="network_interface" value="$(arg gateway_network_interface)"/>
+      <param name="name" value="$(arg concert_name)"/>
+      <param name="firewall" value="false"/>
+      <param name="watch_loop_period" value="$(arg gateway_watch_loop_period)"/>
+      <param name="disable_uuids" value="false" if="$(arg gateway_uuids)"/>
+      <param name="disable_uuids" value="true" unless="$(arg gateway_uuids)"/>
+      <param name="disable_zeroconf" value="false" if="$(arg zeroconf)"/>
+      <param name="disable_zeroconf" value="true" unless="$(arg zeroconf)"/>
+      <param name="custom_rules_file" value=""/> <!-- no special rules on concert -->
+    </node>
+
+    <!-- ****************************** Zeroconf ******************************* -->
+    <group if="$(arg zeroconf)">
+      <node ns="zeroconf" pkg="zeroconf_avahi" type="zeroconf" name="zeroconf">
+        <rosparam param="services" subst_value="true">
+          [ { name: "$(arg concert_name)", type: _concert-master._tcp, port: 11311, domain: local, description: "$(arg concert_description)" } ]
+        </rosparam>
+      </node>
+    </group>
+  </group>
+
+  <!-- ****************************** Rosbridge ******************************** -->
+  <group if="$(arg rosbridge)">
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+      <arg name="address" value="$(arg rosbridge_address)"/>
+      <arg name="port"    value="$(arg rosbridge_port)"/>
+    </include>
+  </group>
+</launch>

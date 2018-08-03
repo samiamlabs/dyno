@@ -1,0 +1,37 @@
+<concert>
+  <arg name="zeroconf" default="true"/>
+
+  <launch title="concert:11311" package="dyno_unity" name="concert.launch" port="11311">
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </launch>
+
+  <launch title="blue:11312" package="dyno_unity" name="client.launch" port="11312">
+    <arg name="robot_name" value="blue"/>
+    <arg name="rosbridge_port" value="9092"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </launch>
+
+  <launch title="green:11313" package="dyno_unity" name="client.launch" port="11313">
+    <arg name="robot_name" value="blue"/>
+    <arg name="rosbridge_port" value="9093"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </launch>
+
+  <launch title="yellow:11314" package="dyno_unity" name="client.launch" port="11314">
+    <arg name="robot_name" value="blue"/>
+    <arg name="rosbridge_port" value="9094"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </launch>
+
+  <launch title="orange:11315" package="dyno_unity" name="client.launch" port="11315">
+    <arg name="robot_name" value="blue"/>
+    <arg name="rosbridge_port" value="9095"/>
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </launch>
+
+  <!-- (uncomment for some useful debugging shells) -->
+<!--
+  <launch title="graph:11311"    package="chatter_concert" name="conductor_graph.launch" port="11311"/>
+  <launch title="remote_gateway_info:11311"    package="chatter_concert" name="remote_gateway_info.launch" port="11311"/>
+ -->
+</concert>
