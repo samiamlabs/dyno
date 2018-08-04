@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
 import rospy
 from std_srvs.srv import *
 
@@ -21,9 +26,6 @@ LocationTuple = namedtuple("LocationTuple", "pose_stamped, marker, label")
 class SimpleWorldState:
     def __init__(self):
         rospy.loginfo("init")
-        self.init_services()
-        self.init_subscribers()
-        self.init_publishers()
 
         self.current_pose = PoseStamped()
 
@@ -34,6 +36,10 @@ class SimpleWorldState:
         rospack = rospkg.RosPack()
         self.save_state_filename = rospack.get_path(
             'dyno_world_state') + '/states/save_state.yaml'
+
+        self.init_services()
+        self.init_subscribers()
+        self.init_publishers()
 
         self.handle_load_state(None)
 

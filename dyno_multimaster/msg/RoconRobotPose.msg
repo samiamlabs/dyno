@@ -1,0 +1,2 @@
+string master_name
+geometry_msgs/PoseStamped pose_stamped

@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+import tf
+
+import tf_conversions.posemath as pm
+import PyKDL
+
+from dyno_multimaster.msg import RoconRobotPose
+
+class RobotPosePublisher:
+    def __init__(self):
+        rospy.init_node('rocon_pose_publisher')
+
+        transform_listener = tf.TransformListener()
+
+        rocon_master_name = rospy.get_param("/rocon/master/name")
+        # topic_name = '/applications/' + rocon_master_name + '/robot_pose'
+        topic_name = '/applications/robot_pose'
+        pose_pub = rospy.Publisher(topic_name, RoconRobotPose, queue_size=10)
+
+        rocon_robot_pose = RoconRobotPose()
+        rocon_robot_pose.master_name = rocon_master_name
+        rocon_robot_pose.pose_stamped.header.frame_id = 'map'
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown():
+            try:
+                base_transform = transform_listener.lookupTransform(
+                    '/map', '/base_footprint', rospy.Time(0))
+                rocon_robot_pose.pose_stamped.pose = pm.toMsg(pm.fromTf(base_transform))
+                rocon_robot_pose.pose_stamped.header.stamp = rospy.Time.now()
+                pose_pub.publish(rocon_robot_pose)
+
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                rospy.logwarn("Transform from map to base_footprint is not available.")
+            rate.sleep();
+
+
+if __name__ == '__main__':
+    try:
+        RobotPosePublisher()
+    except rospy.ROSInterruptException:
+        pass

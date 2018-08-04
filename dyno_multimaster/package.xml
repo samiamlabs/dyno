@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_multimaster</name>
+  <version>0.0.1</version>
+  <description>The dyno_multimaster package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+
+  <license>BSD</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rocon_gateway</depend>
+  <depend>rocon_hub</depend>
+
+  <export>
+
+  </export>
+</package>
