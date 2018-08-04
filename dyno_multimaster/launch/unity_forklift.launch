@@ -8,6 +8,14 @@
     <arg name="zeroconf" value="$(arg zeroconf)"/>
   </include>
 
+  <!-- ****************************** Fleet management  ******************************* -->
+  <arg name="map_file" default="$(find dyno_localization)/maps/warehouse.yaml"/>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node name="multi_robot_navigation" pkg="dyno_multimaster" type="multi_robot_navigation"/>
+
   <!-- ****************************** Dev Tools ******************************** -->
 
   <!-- Show in Rviz -->

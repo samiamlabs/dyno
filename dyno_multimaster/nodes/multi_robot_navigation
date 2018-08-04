@@ -5,10 +5,14 @@
 #
 
 import rospy
-from dyno_multimaster.msg import RoconRobotPose
+from dyno_multimaster.msg import RoconRobotPose, MoveBaseMulti
+from geometry_msgs.msg import PointStamped, PoseStamped, Pose
 from visualization_msgs.msg import Marker, MarkerArray
 
 from collections import namedtuple
+
+import numpy as np
+from copy import deepcopy
 
 RobotTuple = namedtuple("RobotTuple", "pose_stamped, marker")
 
@@ -16,6 +20,7 @@ standard_marker_colors_dict = {
     'blue': {'r': 0.4, 'g': 0.4, 'b': 0.7, 'a': 0.9},
     'green': {'r': 0.4, 'g': 0.7, 'b': 0.4, 'a': 0.9},
 }
+
 
 class MultiRobotNavigation:
     def __init__(self):
@@ -25,36 +30,34 @@ class MultiRobotNavigation:
         self.unique_id_counter = 1000
         self.robot_marker_height = 0.2
 
+        self.move_base_pub_dict = {}
+
+        self.selected_robot_master_name = None
+        self.selection_marker = None
+
         self.init_subscribers()
         self.init_publishers()
 
     def init_subscribers(self):
         rospy.Subscriber('/applications/robot_pose', RoconRobotPose, self.robot_pose_callback)
+        rospy.Subscriber('/clicked_point', PointStamped, self.clicked_point_callback)
+        rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.move_base_callback)
 
     def robot_pose_callback(self, robot_msg):
 
         if robot_msg.master_name in self.robot_dict:
             marker = self.update_robot_marker(robot_msg)
         else:
+            self.move_base_pub_dict[robot_msg.master_name] = self.create_new_move_base_publisher(robot_msg.master_name)
             marker = self.create_robot_marker(robot_msg)
 
         robot_tuple = RobotTuple(pose_stamped=robot_msg.pose_stamped, marker=marker)
 
         self.robot_dict[robot_msg.master_name] = robot_tuple
 
-    def init_publishers(self):
-        self.marker_pub = rospy.Publisher('/multi_robot_markers', MarkerArray, queue_size=1)
-
-    def update(self):
-        pass
-
-    def publish(self):
-        marker_array_msg = MarkerArray()
-
-        for key in self.robot_dict:
-            marker_array_msg.markers.append(self.robot_dict[key].marker)
-
-        self.marker_pub.publish(marker_array_msg)
+    def create_new_move_base_publisher(self, master_name):
+        topic_name = '/concert/' + master_name + '/move_base_multi'
+        return rospy.Publisher(topic_name, MoveBaseMulti, queue_size=1)
 
     def update_robot_marker(self, robot):
         marker = self.robot_dict[robot.master_name].marker
@@ -105,6 +108,104 @@ class MultiRobotNavigation:
         marker.pose.position.z = self.robot_marker_height
 
         return marker
+
+    def clicked_point_callback(self, clicked_point_msg):
+        clicked_point_2d = np.array([clicked_point_msg.point.x, clicked_point_msg.point.y])
+
+        closest_robot_distance = float('Inf')
+        closest_robot_master_name = ''
+
+        for key in self.robot_dict:
+            position = self.robot_dict[key].pose_stamped.pose.position
+            robot_point_2d = np.array([position.x, position.y])
+            distance = np.linalg.norm(clicked_point_2d - robot_point_2d)
+            if distance < closest_robot_distance:
+                closest_robot_master_name = key
+                closest_robot_distance = distance
+
+        rospy.logdebug("Selecing robot with name: %s distance: %f", closest_robot_master_name, closest_robot_distance)
+        self.selected_robot_master_name = closest_robot_master_name
+
+        if self.selection_marker is None:
+            self.selection_marker = self.create_selection_marker(self.robot_dict[self.selected_robot_master_name])
+
+    def update_selection_marker(self, robot):
+        marker = self.selection_marker
+
+        marker.header.frame_id = robot.pose_stamped.header.frame_id
+        marker.header.stamp = rospy.Time.now()
+
+        marker.pose = deepcopy(robot.pose_stamped.pose)
+        marker.pose.position.z = 0.0
+
+        return marker
+
+    def create_selection_marker(self, robot):
+        marker_scale = .7
+        marker_lifetime = 1  # 0 if forever
+        marker_ns = 'selection'
+
+        marker_color = {'r': 0.5, 'g': 0.7, 'b': 0.5, 'a': 0.9}
+
+        marker = Marker()
+
+        marker.ns = marker_ns
+        marker.type = Marker.CYLINDER
+
+        # Generate unique id
+        marker.id = self.unique_id_counter
+        self.unique_id_counter += 1
+
+        marker.action = Marker.ADD
+        marker.lifetime = rospy.Duration(marker_lifetime)
+
+        marker.scale.x = marker_scale
+        marker.scale.y = marker_scale
+        marker.scale.z = 0.01
+
+        marker.color.r = marker_color['r']
+        marker.color.g = marker_color['g']
+        marker.color.b = marker_color['b']
+        marker.color.a = marker_color['a']
+
+        marker.header.frame_id = robot.pose_stamped.header.frame_id
+        marker.header.stamp = rospy.Time.now()
+
+        marker.pose = robot.pose_stamped.pose
+        marker.pose.position.z = 0
+
+        return marker
+
+    def move_base_callback(self, clicked_point_msg):
+        if self.selected_robot_master_name is not None:
+            move_base_multi_msg = MoveBaseMulti()
+            move_base_multi_msg.master_name = self.selected_robot_master_name
+            move_base_multi_msg.pose_stamped = clicked_point_msg
+
+            for key in self.move_base_pub_dict:
+                self.move_base_pub_dict[key].publish(move_base_multi_msg)
+        else:
+            rospy.logwarn('No robots selected, not publishing move base')
+
+    def init_publishers(self):
+        self.marker_pub = rospy.Publisher('/multi_robot_markers', MarkerArray, queue_size=1)
+
+    def update(self):
+        if self.selection_marker is not None:
+            self.selection_marker = self.update_selection_marker(self.robot_dict[self.selected_robot_master_name])
+
+    def publish(self):
+        marker_array_msg = MarkerArray()
+
+        for key in self.robot_dict:
+            marker_array_msg.markers.append(self.robot_dict[key].marker)
+
+        if self.selection_marker is not None:
+            marker_array_msg.markers.append(self.selection_marker)
+
+        self.marker_pub.publish(marker_array_msg)
+
+
 
 
 if __name__ == '__main__':

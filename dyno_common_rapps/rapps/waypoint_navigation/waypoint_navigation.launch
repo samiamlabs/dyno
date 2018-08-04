@@ -1,3 +1,4 @@
 <launch>
   <node name="rocon_pose_publisher" pkg="dyno_multimaster" type="rocon_pose_publisher"/>
+  <node name="client_robot_navigation" pkg="dyno_multimaster" type="client_robot_navigation"/>
 </launch>

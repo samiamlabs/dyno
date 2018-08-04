@@ -12,6 +12,7 @@ add_message_files(
     msg
   FILES
     RoconRobotPose.msg
+    MoveBaseMulti.msg
 )
 
 generate_messages(

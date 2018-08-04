@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+import tf
+
+import tf_conversions.posemath as pm
+import PyKDL
+
+from dyno_multimaster.msg import MoveBaseMulti
+from geometry_msgs.msg import PoseStamped
+
+class ClientRobotNavigation:
+    def __init__(self):
+        rospy.init_node('client_robot_navigation')
+
+        self.master_name = rospy.get_param("/rocon/master/name")
+
+        self.move_base_simple_pub = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
+
+        topic_name = '/concert/' + self.master_name + '/move_base_multi'
+        move_base_multi_sub = rospy.Subscriber(topic_name, MoveBaseMulti, self.move_base_multi_callback)
+
+        rospy.spin()
+
+    def move_base_multi_callback(self, move_base_multi_msg):
+        rospy.loginfo("move base name: %s, this: %s", move_base_multi_msg.master_name, self.master_name)
+        if move_base_multi_msg.master_name == self.master_name:
+            rospy.loginfo("publishing")
+            self.move_base_simple_pub.publish(move_base_multi_msg.pose_stamped)
+
+
+if __name__ == '__main__':
+    try:
+        ClientRobotNavigation()
+    except rospy.ROSInterruptException:
+        pass
