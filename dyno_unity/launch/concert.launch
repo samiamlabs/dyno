@@ -39,6 +39,19 @@
       <arg name="description" value="$(arg concert_description)" />
     </include>
 
+   <!-- ****************************** Conductor ****************************** -->
+    <node pkg="concert_conductor" type="conductor.py" name="conductor" output="screen">
+      <remap from="conductor/flip" to="gateway/flip"/>
+      <remap from="conductor/hub_shutdown" to="hub/shutdown"/>
+      <remap from="conductor/gateway_info" to="gateway/gateway_info"/>
+      <remap from="conductor/remote_gateway_info" to="gateway/remote_gateway_info"/>
+      <remap from="conductor/gateway_shutdown" to="gateway/shutdown"/>
+      <remap from="conductor/gateway_pull" to="gateway/pull"/>
+    </node>
+    <!-- ****************************** Conductor Graph to String ****************************** -->
+    <!--
+    <node pkg="concert_utilities" type="conductor_graph_to_string.py" name="concert_conductor_graph_to_string"/>
+   -->
 
     <!-- **************************** Interactions ***************************** -->
     <!--
