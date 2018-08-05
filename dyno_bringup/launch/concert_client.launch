@@ -133,7 +133,6 @@
 
   <!-- ***************************** Interactions ******************************* -->
 
-  <!-- TODO: add arg  -->
   <arg name="rosbridge_port" default="9090"/>
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
     <arg name="port" value="$(arg rosbridge_port)"/>
