@@ -87,8 +87,8 @@ TebLocalPlannerROS:
 
  # Obstacles
 
- min_obstacle_dist: 0.4
- include_costmap_obstacles: False # Temporary fix...
+ min_obstacle_dist: 0.1
+ include_costmap_obstacles: True
  costmap_obstacles_behind_robot_dist: 1.0
  obstacle_poses_affected: 30
  costmap_converter_plugin: ""

@@ -1,6 +1,7 @@
 image: warehouse.pgm
 resolution: 0.050000
-origin: [-4.303607, -4.239183, 0.000000]
+origin: [-4.378234, -4.228498, 0.000000]
 negate: 0
-occupied_thresh: 0.1
-free_thresh: 0.01
+occupied_thresh: 0.65
+free_thresh: 0.196
+
