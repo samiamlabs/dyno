@@ -95,6 +95,9 @@ TebLocalPlannerROS:
  costmap_converter_spin_thread: True
  costmap_converter_rate: 5
 
+ include_dynamic_obstacles: True
+ dynamic_obstacle_inflation_dist: 0.5
+
  # Optimization
 
  no_inner_iterations: 5

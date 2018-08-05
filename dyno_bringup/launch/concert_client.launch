@@ -79,7 +79,7 @@
   <!-- ******************************** Gateway ******************************** -->
   <arg name="gateway_uuids"                   default="false" doc="all gateways represent their robots with unique uuid's postfixed to the name" />
   <arg name="gateway_watch_loop_period"       default="10"    doc="the polling period for multimaster advertising/flipping" />
-  <arg name="hub_whitelist"                   default="[]"    doc="list of hub names/regex patterns to use if zeroconf is enabled"/>
+  <!-- <arg name="hub_whitelist"                   default="[]"    doc="list of hub names/regex patterns to use if zeroconf is enabled"/> -->
   <arg name="hub_uri"                         default="$(env DYNO_HUB_URI)"      doc="where the gateway can find a hub if zeroconf is disabled"/>
   <arg name="gateway_custom_rules_file"       default=""      doc="name of a user custom parameterisation (yaml)."/>
   <arg name="connection_cache"                default="true"  doc="whether to launch the connection cache node to cache the master state"/>
@@ -100,7 +100,7 @@
       <!-- <rosparam param="hub_whitelist" subst_value="True">$(arg hub_whitelist)</rosparam> -->
       <rosparam param="hub_whitelist" subst_value="True">["$(arg hub_uri)"]</rosparam>
       <param name="hub_uri" value="$(arg hub_uri)"/>
-      <param name="firewall" value="false"/>  <!-- nothing allowed in if true! -->
+      <param name="firewall" value="true"/>  <!-- nothing allowed in if true! -->
       <param name="name" value="$(arg robot_name)"/>
       <param name="watch_loop_period" value="$(arg gateway_watch_loop_period)"/>
       <param name="disable_uuids" value="false" if="$(arg gateway_uuids)"/>

@@ -6,15 +6,19 @@
 
 import rospy
 from dyno_multimaster.msg import RoconRobotPose, MoveBaseMulti
-from geometry_msgs.msg import PointStamped, PoseStamped, Pose
+from geometry_msgs.msg import Point32, PointStamped, PoseStamped, Pose
 from visualization_msgs.msg import Marker, MarkerArray
+from costmap_converter.msg import ObstacleMsg, ObstacleArrayMsg
+
+import tf_conversions.posemath as pm
+import PyKDL
 
 from collections import namedtuple
 
 import numpy as np
 from copy import deepcopy
 
-RobotTuple = namedtuple("RobotTuple", "pose_stamped, marker")
+RobotTuple = namedtuple("RobotTuple", "pose_stamped, marker, obstacle")
 
 standard_marker_colors_dict = {
     'blue': {'r': 0.4, 'g': 0.4, 'b': 0.7, 'a': 0.9},
@@ -29,10 +33,11 @@ class MultiRobotNavigation:
         rospy.init_node('multi_robot_navigation')
 
         self.robot_dict = {}
-        self.unique_id_counter = 1000
+        self.unique_id_counter = 0  # 1000
         self.robot_marker_height = 0.2
 
         self.move_base_pub_dict = {}
+        self.obstacle_pub_dict = {}
 
         self.selected_robot_master_name = None
         self.selection_marker = None
@@ -49,17 +54,84 @@ class MultiRobotNavigation:
 
         if robot_msg.master_name in self.robot_dict:
             marker = self.update_robot_marker(robot_msg)
+            obstacle = self.update_obstacle(robot_msg)
         else:
-            self.move_base_pub_dict[robot_msg.master_name] = self.create_new_move_base_publisher(robot_msg.master_name)
+            self.move_base_pub_dict[robot_msg.master_name] = self.create_move_base_publisher(robot_msg.master_name)
+            self.obstacle_pub_dict[robot_msg.master_name] = self.create_obstacle_publisher(robot_msg.master_name)
+            obstacle = self.create_obstacle(robot_msg)
             marker = self.create_robot_marker(robot_msg)
+            self.unique_id_counter += 1
 
-        robot_tuple = RobotTuple(pose_stamped=robot_msg.pose_stamped, marker=marker)
+        robot_tuple = RobotTuple(pose_stamped=robot_msg.pose_stamped,
+                                 marker=marker, obstacle=obstacle)
 
         self.robot_dict[robot_msg.master_name] = robot_tuple
 
-    def create_new_move_base_publisher(self, master_name):
+    def create_move_base_publisher(self, master_name):
         topic_name = '/concert/' + master_name + '/move_base_multi'
         return rospy.Publisher(topic_name, MoveBaseMulti, queue_size=1)
+
+    def create_obstacle_publisher(self, master_name):
+        topic_name = '/concert/' + master_name + '/obstacles'
+        return rospy.Publisher(topic_name, ObstacleArrayMsg, queue_size=1)
+
+    def update_obstacle(self, robot):
+        obstacle_msg = self.robot_dict[robot.master_name].obstacle
+
+        obstacle_msg.header.frame_id = robot.pose_stamped.header.frame_id
+
+        point = robot.pose_stamped.pose.position
+
+        # FIXME: do this propery...
+        dt = (rospy.Time.now() - obstacle_msg.header.stamp).to_sec()
+        map_delta_x = point.x - obstacle_msg.polygon.points[0].x
+        map_delta_y = point.y - obstacle_msg.polygon.points[0].y
+
+        rotation_frame = pm.fromMsg(Pose(orientation=obstacle_msg.orientation))
+        map_velocity = PyKDL.Vector(map_delta_x/dt, map_delta_y/dt, 0)
+        robot_velocity = rotation_frame.Inverse() * map_velocity
+
+        # rospy.loginfo("x: %f, y: %f", robot_velocity[0], robot_velocity[1])
+
+        # FIXME: use robot stamps instaid?
+        obstacle_msg.header.stamp = rospy.Time.now()
+
+        obstacle_msg.polygon.points = [Point32()]
+        obstacle_msg.polygon.points[0].x = point.x
+        obstacle_msg.polygon.points[0].y = point.y
+        obstacle_msg.polygon.points[0].z = point.z
+
+        obstacle_msg.orientation = robot.pose_stamped.pose.orientation
+
+        obstacle_msg.velocities.twist.linear.x = robot_velocity[0]
+        obstacle_msg.velocities.twist.linear.y = robot_velocity[1]
+
+        return obstacle_msg
+
+    def create_obstacle(self, robot):
+        obstacle_msg = ObstacleMsg()
+        obstacle_msg.header.stamp = rospy.Time.now()
+        obstacle_msg.header.frame_id = robot.pose_stamped.header.frame_id
+
+        obstacle_msg.id = self.unique_id_counter
+
+        # Add point obstacle, TODO: change based on robot type?
+        point = robot.pose_stamped.pose.position
+        obstacle_msg.polygon.points = [Point32()]
+        obstacle_msg.polygon.points[0].x = point.x
+        obstacle_msg.polygon.points[0].y = point.y
+        obstacle_msg.polygon.points[0].z = point.z
+
+        obstacle_msg.orientation = robot.pose_stamped.pose.orientation
+
+        obstacle_msg.velocities.twist.linear.x = 0  # vel_x
+        obstacle_msg.velocities.twist.linear.y = 0  # vel_y
+        obstacle_msg.velocities.twist.linear.z = 0
+        obstacle_msg.velocities.twist.angular.x = 0
+        obstacle_msg.velocities.twist.angular.y = 0
+        obstacle_msg.velocities.twist.angular.z = 0
+
+        return obstacle_msg
 
     def update_robot_marker(self, robot):
         marker = self.robot_dict[robot.master_name].marker
@@ -89,7 +161,6 @@ class MultiRobotNavigation:
 
         # Generate unique id
         marker.id = self.unique_id_counter
-        self.unique_id_counter += 1
 
         marker.action = Marker.ADD
         marker.lifetime = rospy.Duration(marker_lifetime)
@@ -204,6 +275,18 @@ class MultiRobotNavigation:
 
         if self.selection_marker is not None:
             marker_array_msg.markers.append(self.selection_marker)
+
+        # Publish robot poses as obstacles to all other clients on separate topics
+        for pub_key in self.obstacle_pub_dict:
+            obstacle_array_msg = ObstacleArrayMsg()
+            obstacle_array_msg.header.frame_id = 'map'
+            obstacle_array_msg.header.stamp = rospy.Time.now()
+
+            for robot_key in self.robot_dict:
+                if pub_key != robot_key:
+                    obstacle_array_msg.obstacles.append(self.robot_dict[robot_key].obstacle)
+
+            self.obstacle_pub_dict[pub_key].publish(obstacle_array_msg)
 
         self.marker_pub.publish(marker_array_msg)
 

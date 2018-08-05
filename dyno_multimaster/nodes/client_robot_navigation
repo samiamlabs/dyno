@@ -13,6 +13,7 @@ import PyKDL
 from dyno_multimaster.msg import MoveBaseMulti
 from geometry_msgs.msg import PoseStamped
 
+
 class ClientRobotNavigation:
     def __init__(self):
         rospy.init_node('client_robot_navigation')
