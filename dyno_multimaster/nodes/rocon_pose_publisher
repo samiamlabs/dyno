@@ -36,7 +36,7 @@ class RobotPosePublisher:
                 pose_pub.publish(rocon_robot_pose)
 
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                rospy.logwarn("Transform from map to base_footprint is not available.")
+                rospy.logwarn_throttle(10, "Transform from map to base_footprint is not available.")
             rate.sleep();
 
 
