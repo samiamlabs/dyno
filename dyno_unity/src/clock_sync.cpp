@@ -48,14 +48,9 @@ int main(int argc, char **argv)
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
-  boost::chrono::system_clock::time_point begin = boost::chrono::system_clock::now();
-  boost::chrono::system_clock::time_point end   = boost::chrono::system_clock::now();
-
   boost::chrono::system_clock::time_point wait_until   = boost::chrono::system_clock::now();
 
   ros::Time internal_time(0);
-  double elapsed_secs = 0;
-
 
   const ros::Duration dt = ros::Duration(0.01); // 100Hz
 
@@ -78,7 +73,6 @@ int main(int argc, char **argv)
     clock_publisher.publish(clock);
 
     if (sync_updated_) {
-      // overwrite internal_time with unity time
 
       sync_updated_ = false;
 
