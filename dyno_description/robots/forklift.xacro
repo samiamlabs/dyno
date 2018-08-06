@@ -24,7 +24,7 @@
   <!-- <vive_tracker name="vive_tracker" x_offset="0.13" y_offset="0" z_offset="0.391" yaw_offset="0" parent="base_link"/> -->
 
   <!-- Leap Motion -->
-  <leap_motion name="leap_motion" x_offset="-0.024" y_offset="0" z_offset="0.08" yaw_offset="${M_PI}" parent="fork_link"/>
+  <leap_motion name="leap_motion" x_offset="-0.017" y_offset="0" z_offset="0.08" yaw_offset="${M_PI}" parent="fork_link"/>
 
   <!-- Imu -->
   <imu x_offset="0" y_offset="0" z_offset="0"/>
