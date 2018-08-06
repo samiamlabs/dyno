@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+
+import tf
+import tf_conversions.posemath as pm
+
+from nav_msgs.msg import Odometry
+
+
+class OdomBroadcaster:
+    def __init__(self):
+        rospy.init_node('odom_broadcaster')
+
+        self.transform_broadcaster = tf.TransformBroadcaster()
+
+        rospy.Subscriber('/odom', Odometry, self.odometry_callback)
+
+    def odometry_callback(self, odometry_msg):
+        parent_frame_id = 'odom'
+        child_frame_id = 'base_footprint'
+
+        odom_time = odometry_msg.header.stamp
+
+        # Post date to prevent lookup errors in TEB and similar stuff
+        odom_time -= rospy.Duration.from_sec(0.1)
+
+        (odom_translation, odom_rotation) = pm.toTf(pm.fromMsg(odometry_msg.pose.pose))
+
+        self.transform_broadcaster.sendTransform(odom_translation,
+                                                 odom_rotation,
+                                                 odom_time,
+                                                 child_frame_id,
+                                                 parent_frame_id)
+
+
+if __name__ == '__main__':
+    try:
+        obstacle_relay = OdomBroadcaster()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

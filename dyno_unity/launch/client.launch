@@ -5,6 +5,8 @@
   <arg name="zeroconf" default="false"/>
   <arg name="rosbridge_port" default="9090"/>
 
+  <arg name="base" default="$(env DYNO_BASE)"/>
+
   <!-- set use_sim_time flag -->
   <param name="/use_sim_time" value="$(arg use_sim_time)"/>
 
@@ -14,12 +16,25 @@
     <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
   </include>
 
-	<node name="file_server" pkg="file_server" type="file_server" output="screen"/>
-
   <!-- Config -->
   <rosparam file="$(find dyno_unity)/config/joint_limits.yaml" command="load"/>
 
-  <!-- Driver/intreface -->
-  <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
+  <!-- Base spesific stuff -->
+  <group if="$(eval base == 'forklift')">
+    <!-- Driver/intreface and simulation time -->
+    <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
+  </group>
+
+  <group if="$(eval base == 'quadrotor')">
+    <!-- Simulation time -->
+    <node name="utity_clock_sync" pkg="dyno_unity" type="clock_sync"/>
+    <!-- <node name="utity_clock" pkg="dyno_unity" type="clock"/> -->
+
+    <!-- TODO: publish actual height with height sensor, instaid of using with odom? -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster"  args="0 0 0 0 0 0 base_footprint base_link 20"/>
+
+    <node name="odom_broadcaster" pkg="dyno_unity" type="odom_tf_broadcaster"/>
+
+  </group>
 
 </launch>
