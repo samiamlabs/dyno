@@ -3,9 +3,23 @@
   <arg name="zeroconf" default="false"/>
   <arg name="rosbridge_port" default="9090"/>
 
-  <include file="$(find dyno_bringup)/launch/concert_client.launch">
-    <arg name="robot_name" value="$(arg robot_name)"/>
-    <arg name="zeroconf" value="$(arg zeroconf)"/>
-    <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
-  </include>
+  <arg name="base" default="$(env DYNO_BASE)"/>
+
+  <group if="$(eval base == 'quadrotor')">
+    <include file="$(find dyno_bringup)/launch/concert_client.launch">
+      <arg name="robot_name" value="$(arg robot_name)"/>
+      <arg name="zeroconf" value="$(arg zeroconf)"/>
+      <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
+      <arg name="rapp_package_whitelist" value="[dyno_common_rapps, dyno_quadrotor_rapps]"/>
+    </include>
+  </group>
+
+  <group if="$(eval base != 'quadrotor')">
+    <include file="$(find dyno_bringup)/launch/concert_client.launch">
+      <arg name="robot_name" value="$(arg robot_name)"/>
+      <arg name="zeroconf" value="$(arg zeroconf)"/>
+      <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
+    </include>
+  </group>
+
 </launch>

@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start one of the trees')
     parser.add_argument('name', action='store', nargs='?',
                         default='route_scheduler',
-                        choices=['route_scheduler'],
+                        choices=['route_scheduler', 'drone_parcel_delivery'],
                         help='name of the rapp tree to start')
     command_line_args = rospy.myargv(argv=sys.argv)[1:]
     args = parser.parse_args(command_line_args)

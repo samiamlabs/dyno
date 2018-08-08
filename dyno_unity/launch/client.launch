@@ -27,8 +27,8 @@
 
   <group if="$(eval base == 'quadrotor')">
     <!-- Simulation time -->
-    <node name="utity_clock_sync" pkg="dyno_unity" type="clock_sync"/>
-    <!-- <node name="utity_clock" pkg="dyno_unity" type="clock"/> -->
+    <!-- <node name="utity_clock_sync" pkg="dyno_unity" type="clock_sync"/> -->
+    <node name="utity_clock" pkg="dyno_unity" type="clock"/>
 
     <!-- TODO: publish actual height with height sensor, instaid of using with odom? -->
     <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster"  args="0 0 0 0 0 0 base_footprint base_link 20"/>

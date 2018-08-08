@@ -1,0 +1,26 @@
+<launch>
+
+  <!-- Zeroconf -->
+  <arg name="zeroconf" default="true"/>
+
+  <!-- ****************************** Concert ******************************** -->
+  <include file="$(find dyno_unity)/launch/concert.launch">
+    <arg name="zeroconf" value="$(arg zeroconf)"/>
+  </include>
+
+  <!-- ****************************** Fleet management  ******************************* -->
+  <arg name="map_file" default="$(find dyno_localization)/maps/quadrotor.yaml"/>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node name="multi_robot_navigation" pkg="dyno_multimaster" type="multi_robot_navigation"/>
+
+  <!-- ****************************** Dev Tools ******************************** -->
+
+  <!-- Show in Rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/quadcopter_concert.rviz"/>
+
+  <!-- Start rqt -->
+  <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+</launch>

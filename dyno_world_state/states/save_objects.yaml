@@ -1,0 +1,424 @@
+Box Blue: !!python/object/new:__main__.ObjectTuple
+- &id001 !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -9.76
+    - -8.56
+    - 0.15
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+- parcel
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - &id002 !!python/object/new:rospy.rostime.Time
+      state:
+      - 237
+      - 590000000
+    - map
+  - objects
+  - 1008
+  - 1
+  - 0
+  - *id001
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.3
+    - 0.3
+    - 0.3
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.7
+    - 0.4
+    - 0.4
+    - 0.9
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - ''
+  - ''
+  - false
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - object_labels
+  - 1009
+  - 9
+  - 0
+  - !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - -9.76
+      - -8.56
+      - 0.4
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - &id003 !!python/object/apply:numpy.dtype
+          args:
+          - f8
+          - 0
+          - 1
+          state: !!python/tuple
+          - 3
+          - <
+          - null
+          - null
+          - null
+          - -1
+          - -1
+          - 0
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!binary |
+          AAAAAAAA8D8=
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.0
+    - 0.0
+    - 0.24
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.2
+    - 0.2
+    - 0.5
+    - 1.0
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - Box Blue
+  - ''
+  - false
+Box Green: !!python/object/new:__main__.ObjectTuple
+- &id004 !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -10.55
+    - 12.05
+    - 0.15
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+- parcel
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - objects
+  - 1010
+  - 1
+  - 0
+  - *id004
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.3
+    - 0.3
+    - 0.3
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.7
+    - 0.4
+    - 0.4
+    - 0.9
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - ''
+  - ''
+  - false
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - object_labels
+  - 1011
+  - 9
+  - 0
+  - !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - -10.55
+      - 12.05
+      - 0.4
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!binary |
+          AAAAAAAA8D8=
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.0
+    - 0.0
+    - 0.24
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.2
+    - 0.2
+    - 0.5
+    - 1.0
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - Box Green
+  - ''
+  - false
+Box Red: !!python/object/new:__main__.ObjectTuple
+- &id005 !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -5.39
+    - 11.97
+    - 0.15
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+- parcel
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - objects
+  - 1012
+  - 1
+  - 0
+  - *id005
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.3
+    - 0.3
+    - 0.3
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.7
+    - 0.4
+    - 0.4
+    - 0.9
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - ''
+  - ''
+  - false
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - object_labels
+  - 1013
+  - 9
+  - 0
+  - !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - -5.39
+      - 11.97
+      - 0.4
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!binary |
+          AAAAAAAA8D8=
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.0
+    - 0.0
+    - 0.24
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.2
+    - 0.2
+    - 0.5
+    - 1.0
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - Box Red
+  - ''
+  - false
+Box Yellow: !!python/object/new:__main__.ObjectTuple
+- &id006 !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - 1.71
+    - 10.76
+    - 0.15
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+- parcel
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - objects
+  - 1014
+  - 1
+  - 0
+  - *id006
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.3
+    - 0.3
+    - 0.3
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.7
+    - 0.4
+    - 0.4
+    - 0.9
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - ''
+  - ''
+  - false
+- !!python/object/new:visualization_msgs.msg._Marker.Marker
+  state:
+  - !!python/object/new:std_msgs.msg._Header.Header
+    state:
+    - 0
+    - *id002
+    - map
+  - object_labels
+  - 1015
+  - 9
+  - 0
+  - !!python/object/new:geometry_msgs.msg._Pose.Pose
+    state:
+    - !!python/object/new:geometry_msgs.msg._Point.Point
+      state:
+      - 1.71
+      - 10.76
+      - 0.4
+    - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+      state:
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - "\0\0\0\0\0\0\0\0"
+      - !!python/object/apply:numpy.core.multiarray.scalar
+        - *id003
+        - !!binary |
+          AAAAAAAA8D8=
+  - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
+    state:
+    - 0.0
+    - 0.0
+    - 0.24
+  - !!python/object/new:std_msgs.msg._ColorRGBA.ColorRGBA
+    state:
+    - 0.2
+    - 0.2
+    - 0.5
+    - 1.0
+  - !!python/object/new:rospy.rostime.Duration
+    state:
+    - 1
+    - 0
+  - false
+  - []
+  - []
+  - Box Yellow
+  - ''
+  - false

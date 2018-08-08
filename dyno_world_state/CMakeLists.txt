@@ -14,6 +14,8 @@ add_message_files(
   FILES
     Location.msg
     LocationArray.msg
+    Object.msg
+    ObjectArray.msg
 )
 
 add_service_files(
@@ -21,6 +23,7 @@ add_service_files(
     srv
   FILES
     AddCurrentLocation.srv
+    GetObjects.srv
 )
 
 generate_messages(

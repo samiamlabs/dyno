@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="dyno_world_state" name="world_satate_node" type="simple" output="screen"/>
+  <node pkg="dyno_world_state" name="simple_world_state" type="simple" output="screen"/>
 
   <node pkg="robot_pose_publisher" name="robot_pose_publisher" type="robot_pose_publisher">
     <param name="is_stamped" value="true"/>

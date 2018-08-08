@@ -20,16 +20,18 @@ from tf.transformations import quaternion_from_euler, euler_from_quaternion
 import rospkg
 import yaml
 
+from copy import deepcopy
+
 LocationTuple = namedtuple("LocationTuple", "pose_stamped, marker, label")
+ObjectTuple = namedtuple("ObjectTuple", "pose, type, marker, label")
 
 
 class SimpleWorldState:
     def __init__(self):
-        rospy.loginfo("init")
-
         self.current_pose = PoseStamped()
 
         self.location_dict = {}
+        self.object_dict = {}
 
         self.unique_id_counter = 1000
 
@@ -37,13 +39,18 @@ class SimpleWorldState:
         self.save_state_filename = rospack.get_path(
             'dyno_world_state') + '/states/save_state.yaml'
 
+        self.save_objects_filename = rospack.get_path(
+            'dyno_world_state') + '/states/save_objects.yaml'
+
         self.init_services()
         self.init_subscribers()
         self.init_publishers()
 
         self.handle_load_state(None)
+        self.handle_load_objects(None)
 
     def init_services(self):
+        # Locations
         self.add_current_pose_service = rospy.Service(
             '/world_state/add_current_location', AddCurrentLocation, self.handle_add_current_pose)
 
@@ -56,10 +63,21 @@ class SimpleWorldState:
         self.load_state_service = rospy.Service(
             '/world_state/load', Empty, self.handle_load_state)
 
-    def handle_add_current_pose(self, request):
-        rospy.loginfo("Adding current pose as %s:", request.name)
-        rospy.loginfo(self.current_pose)
+        # Objects
+        self.load_state_service = rospy.Service(
+            '/world_state/get_unity_objects', Empty, self.handle_get_unity_objects)
 
+        self.add_current_pose_service = rospy.Service(
+            '/world_state/clear_objects', Empty, self.handle_clear_objects)
+
+        self.save_state_service = rospy.Service(
+            '/world_state/save_objects', Empty, self.handle_save_objects)
+
+        self.load_state_service = rospy.Service(
+            '/world_state/load_objects', Empty, self.handle_load_objects)
+
+
+    def handle_add_current_pose(self, request):
         location_name = request.name
 
         marker = self.create_location_marker(self.current_pose)
@@ -69,18 +87,15 @@ class SimpleWorldState:
             pose_stamped=self.current_pose, marker=marker, label=label)
         self.location_dict[str(location_name)] = location
 
-        rospy.loginfo("Number of poses: %d", len(self.location_dict))
-
         response = AddCurrentLocationResponse()
         response.success = True
 
         return response
 
     def handle_clear_poses(self, request):
-        rospy.loginfo("Clearing poses!")
+        rospy.loginfo("Clearing poses")
         self.location_dict = {}
 
-        rospy.loginfo("Number of poses: %d", len(self.location_dict))
         return EmptyResponse()
 
     def handle_save_state(self, request):
@@ -102,6 +117,47 @@ class SimpleWorldState:
 
         return EmptyResponse()
 
+    def handle_clear_objects(self, request):
+        rospy.loginfo("Clearing objects")
+        self.object_dict = {}
+
+        return EmptyResponse()
+
+    def handle_save_objects(self, request):
+        rospy.loginfo("Saving objects")
+        with open(self.save_objects_filename, 'w') as outfile:
+            yaml.dump(self.object_dict, outfile, default_flow_style=False)
+
+        return EmptyResponse()
+
+    def handle_load_objects(self, request):
+        rospy.loginfo("Loading objects")
+        try:
+            with open(self.save_objects_filename, 'r') as infile:
+                try:
+                    self.object_dict = yaml.load(infile)
+                except yaml.YAMLError as exc:
+                    rospy.logerr('Failed to load state!')
+        except:
+            rospy.logwarn("No save file found!")
+
+        return EmptyResponse()
+
+    def handle_get_unity_objects(self, request):
+        rospy.loginfo("Getting objects from Unity")
+        rospy.wait_for_service('/unity/get_objects')
+        try:
+            response = rospy.ServiceProxy('/unity/get_objects', GetObjects)()
+            for object in response.objects:
+                marker = self.create_object_marker(object)
+                label = self.create_object_label(object, object.name)
+                objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
+                self.object_dict[object.name] = objectTuple
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return EmptyResponse()
+
     def init_subscribers(self):
         rospy.Subscriber("/robot_pose", PoseStamped,
                          self.current_pose_callback)
@@ -110,16 +166,104 @@ class SimpleWorldState:
         self.location_pub = rospy.Publisher(
             '/world_state/locations', LocationArray, queue_size=1)
 
+        self.object_pub = rospy.Publisher(
+            '/world_state/objects', ObjectArray, queue_size=1)
+
         self.marker_pub = rospy.Publisher(
             '/world_state/markers', MarkerArray, queue_size=1)
 
     def current_pose_callback(self, pose_msg):
         self.current_pose = pose_msg
 
+    def create_object_marker(self, object):
+        marker_scale = .3
+        marker_lifetime = 1  # 0 if forever
+        marker_ns = 'objects'
+        marker_color = {'r': 0.7, 'g': 0.4, 'b': 0.4, 'a': 0.9}
+
+        marker = Marker()
+
+        marker.ns = marker_ns
+        marker.type = Marker.CUBE
+
+        # Generate unique id
+        marker.id = self.unique_id_counter
+        self.unique_id_counter += 1
+
+        marker.action = Marker.ADD
+        marker.lifetime = rospy.Duration(marker_lifetime)
+
+        marker.scale.x = marker_scale
+        marker.scale.y = marker_scale
+        marker.scale.z = marker_scale
+
+        marker.color.r = marker_color['r']
+        marker.color.g = marker_color['g']
+        marker.color.b = marker_color['b']
+        marker.color.a = marker_color['a']
+
+        marker.header.frame_id = 'map'
+        marker.header.stamp = rospy.Time.now()
+
+        marker.pose = object.pose
+
+        return marker
+
+    def create_object_label(self, object, text):
+        font_size = 0.24
+        marker_lifetime = 1  # 0 if forever
+        marker_ns = 'object_labels'
+        marker_color = {'r': 0.2, 'g': 0.2, 'b': 0.5, 'a': 1.0}
+
+        label_marker = Marker()
+
+        label_marker.ns = marker_ns
+
+        # Generate unique id
+        label_marker.id = self.unique_id_counter
+        self.unique_id_counter += 1
+
+        label_marker.type = Marker.TEXT_VIEW_FACING
+        label_marker.action = Marker.ADD
+        label_marker.lifetime = rospy.Duration(marker_lifetime)
+
+        label_marker.scale.z = font_size
+        label_marker.text = text
+
+        label_marker.color.r = marker_color['r']
+        label_marker.color.g = marker_color['g']
+        label_marker.color.b = marker_color['b']
+        label_marker.color.a = marker_color['a']
+
+        label_marker.header.frame_id = 'map'
+        label_marker.header.stamp = rospy.Time.now()
+
+        label_marker.pose = self.modify_object_label_pose(object.pose)
+
+        return label_marker
+
+    def modify_object_label_pose(self, pose):
+        temp_pose = deepcopy(pose)
+
+        q = temp_pose.orientation
+        angles = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        alpha = angles[2]
+
+        modified_x = temp_pose.position.x
+        modified_y = temp_pose.position.y
+        modified_z = temp_pose.position.z + 0.25
+
+        q_angle = quaternion_from_euler(0, 0, alpha, axes='sxyz')
+        q = Quaternion(*q_angle)
+
+        temp_pose = Pose(Point(modified_x, modified_y, modified_z), q)
+
+        return temp_pose
+
     def create_location_marker(self, location):
         marker_scale = .33
         marker_lifetime = 1  # 0 if forever
-        marker_ns = 'location'
+        marker_ns = 'locations'
         marker_color = {'r': 0.4, 'g': 0.4, 'b': 0.7, 'a': 0.9}
 
         marker = Marker()
@@ -146,9 +290,8 @@ class SimpleWorldState:
         marker.header.frame_id = location.header.frame_id
         marker.header.stamp = rospy.Time.now()
 
-        rospy.loginfo(location.header.frame_id)
-
-        marker.pose = location.pose
+        marker.pose = deepcopy(location.pose)
+        marker.pose.position.z = 0.0
 
         return marker
 
@@ -186,7 +329,7 @@ class SimpleWorldState:
         return label_marker
 
     def modify_location_label_pose(self, pose):
-        temp_pose = pose
+        temp_pose = deepcopy(pose)
 
         q = temp_pose.orientation
         angles = euler_from_quaternion([q.x, q.y, q.z, q.w])
@@ -194,7 +337,7 @@ class SimpleWorldState:
 
         modified_x = temp_pose.position.x
         modified_y = temp_pose.position.y
-        modified_z = temp_pose.position.z + 0.15
+        modified_z = 0.15
 
         q_angle = quaternion_from_euler(0, 0, alpha, axes='sxyz')
         q = Quaternion(*q_angle)
@@ -207,8 +350,8 @@ class SimpleWorldState:
         pass
 
     def publish(self):
-        location_array_msg = LocationArray()
 
+        location_array_msg = LocationArray()
         for key in self.location_dict:
             location_msg = Location()
             location_msg.name = key
@@ -217,11 +360,23 @@ class SimpleWorldState:
 
         self.location_pub.publish(location_array_msg)
 
-        marker_array_msg = MarkerArray()
+        object_array_msg = ObjectArray()
+        for key in self.object_dict:
+            object_msg = Object()
+            object_msg.name = key
+            object_msg.pose = self.object_dict[key].pose
+            object_array_msg.objects.append(object_msg)
 
+        self.object_pub.publish(object_array_msg)
+
+        marker_array_msg = MarkerArray()
         for key in self.location_dict:
             marker_array_msg.markers.append(self.location_dict[key].marker)
             marker_array_msg.markers.append(self.location_dict[key].label)
+
+        for key in self.object_dict:
+            marker_array_msg.markers.append(self.object_dict[key].marker)
+            marker_array_msg.markers.append(self.object_dict[key].label)
 
         self.marker_pub.publish(marker_array_msg)
 
