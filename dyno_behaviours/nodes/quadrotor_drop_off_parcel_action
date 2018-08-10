@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+##############################################################################
+# Documentation
+##############################################################################
+"""
+Action server for quadrotor dopping off parcel in Unity simulation
+"""
+##############################################################################
+# Imports
+##############################################################################
+
+import rospy
+import actionlib
+from dyno_msgs.msg import *
+from dyno_msgs.srv import *
+from geometry_msgs.msg import Twist
+import tf
+
+
+##############################################################################
+# Main
+##############################################################################
+
+
+class DropOffParcel:
+    def __init__(self):
+        self.server = actionlib.SimpleActionServer(
+            'drop_off_parcel', QuadrotorDropOffParcelAction, self.execute, False)
+        self.server.start()
+
+        self.tf_listener = tf.TransformListener()
+        self.cmd_vel_pub = rospy.Publisher('/nav_vel', Twist, queue_size=1)
+
+        self.grab_object = rospy.ServiceProxy('/set_object_grabber', SetObjectGrabber())
+
+    def execute(self, goal):
+        rospy.loginfo("Drop off parcel action started")
+
+        success = True
+        self.feedback = QuadrotorDropOffParcelFeedback()
+        self.result = QuadrotorDropOffParcelResult()
+
+        height = 1.0
+
+        rate = rospy.Rate(20)
+
+        pallet_picked_up = False
+        going_down = True
+        going_up = False
+
+        initial_height = None
+        drop_off_height = 0.48
+
+        while not pallet_picked_up:
+
+            if self.server.is_preempt_requested():
+                rospy.loginfo('Drop off parcel action preempted')
+                self.server.set_preempted()
+                success = False
+                break
+
+            try:
+                (trans, rot) = self.tf_listener.lookupTransform(
+                    'map', 'base_link', rospy.Time(0))
+
+                height = trans[2]
+                if initial_height is None:
+                    initial_height = height
+
+                if height < drop_off_height:
+                    try:
+                        self.grab_object(SetObjectGrabberRequest(False))
+                    except rospy.ServiceException, e:
+                        rospy.logwarn('Service call failed: %s', e)
+
+                    going_down = False
+                    going_up = True
+
+                if height > initial_height and going_up:
+                    pallet_picked_up = True
+                    going_down = False
+                    going_up = False
+                    cmd_vel_msg = Twist()
+
+                if going_down:
+                    cmd_vel_msg = Twist()
+                    cmd_vel_msg.linear.z = -0.1
+                elif going_up:
+                    cmd_vel_msg = Twist()
+                    cmd_vel_msg.linear.z = 0.1
+                else:
+                    cmd_vel_msg = Twist()
+
+                self.cmd_vel_pub.publish(cmd_vel_msg)
+
+                rate.sleep()
+
+            except (tf_spec.Exception, tf_spec.ConnectivityException, tf_spec.LookupException):
+                rospy.logdebug("TF Exception")
+                self.cmd_vel_pub.publish(Twist())
+                break
+
+        # Stop quadrotor
+        self.cmd_vel_pub.publish(Twist())
+
+        if success:
+            rospy.loginfo('Drop off parcel action succeeded')
+            self.server.set_succeeded(self.result)
+
+
+if __name__ == '__main__':
+    rospy.init_node('drop_off_parcel_action')
+    server = DropOffParcel()
+    rospy.spin()

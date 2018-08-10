@@ -1,1 +1,0 @@
-dyno_world_state/Object[] objects

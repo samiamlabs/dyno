@@ -18,7 +18,7 @@ Adding location to blackboard
 import py_trees
 import rospy
 import std_msgs.msg as std_msgs
-import dyno_world_state.msg as dyno_world_state
+import dyno_msgs.msg as dyno_msgs
 
 from py_trees_ros import subscribers
 
@@ -56,7 +56,7 @@ class ToBlackboard(subscribers.ToBlackboard):
         self.blackboard.location_queue = []
         self.blackboard.empty_queue_warning = True   # decision making
 
-        self.location_queue_publisher = rospy.Publisher("/route_scheduler/location_queue", dyno_world_state.LocationArray, queue_size=5);
+        self.location_queue_publisher = rospy.Publisher("/route_scheduler/location_queue", dyno_msgs.LocationArray, queue_size=5);
 
     def update(self):
         """
@@ -95,10 +95,10 @@ class ToBlackboard(subscribers.ToBlackboard):
 
         self.feedback_message = "No locations in queue" if self.blackboard.empty_queue_warning else "Locations queue ok"
 
-        location_queue_msg = dyno_world_state.LocationArray()
+        location_queue_msg = dyno_msgs.LocationArray()
 
         for location_name in self.blackboard.location_queue:
-            location_msg = dyno_world_state.Location()
+            location_msg = dyno_msgs.Location()
             location_msg.name = location_name
             location_queue_msg.locations.append(location_msg)
 

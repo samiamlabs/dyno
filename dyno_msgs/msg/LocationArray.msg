@@ -1,0 +1,1 @@
+dyno_msgs/Location[] locations

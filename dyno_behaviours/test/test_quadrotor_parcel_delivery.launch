@@ -1,8 +1,15 @@
 <launch>
   <!-- Mock -->
-  <!-- <include file="$(find py_trees_ros)/launch/mock_robot.launch"/> -->
   <node pkg="py_trees_ros" name="move_base" type="mock_component" args="move_base.MoveBase">
-      <param name="duration" value="5" />
+      <param name="duration" value="2" />
+  </node>
+
+  <node pkg="dyno_behaviours" name="pick_up_parcel_action" type="mock_component" args="quadrotor.PickUpParcel">
+      <param name="duration" value="1" />
+  </node>
+
+  <node pkg="dyno_behaviours" name="drop_off_parcel_action" type="mock_component" args="quadrotor.DropOffParcel">
+      <param name="duration" value="1" />
   </node>
 
   <!-- World State -->
@@ -16,9 +23,9 @@
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
 
   <!-- Tree -->
-  <include file="$(find dyno_behaviours)/launch/drone_parcel_delivery.launch"/>
+  <include file="$(find dyno_behaviours)/launch/quadrotor_parcel_delivery.launch"/>
 
   <!-- Viz -->
   <node pkg="rqt_py_trees" name="rqt_py_trees" type="rqt_py_trees"/>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_drone_parcel_delivery.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dyno_viz)/rviz/test_quadrotor_parcel_delivery.rviz"/>
 </launch>

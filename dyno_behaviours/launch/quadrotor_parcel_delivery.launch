@@ -1,0 +1,5 @@
+<launch>
+  <!-- Behaviour tree -->
+  <node name="tree" pkg="dyno_behaviours" type="rapp_tree" args="drone_parcel_delivery"/>
+
+</launch>

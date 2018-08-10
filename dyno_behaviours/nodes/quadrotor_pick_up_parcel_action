@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+#
+# License: BSD
+# https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+##############################################################################
+# Documentation
+##############################################################################
+"""
+Action server for quadrotor picking up parcel in Unity simulation
+"""
+##############################################################################
+# Imports
+##############################################################################
+
+import rospy
+import actionlib
+from dyno_msgs.msg import *
+from dyno_msgs.srv import *
+from geometry_msgs.msg import Twist
+import tf
+
+
+##############################################################################
+# Main
+##############################################################################
+
+
+class PickUpParcel:
+    def __init__(self):
+        self.server = actionlib.SimpleActionServer(
+            'pick_up_parcel', QuadrotorPickUpParcelAction, self.execute, False)
+        self.server.start()
+
+        self.tf_listener = tf.TransformListener()
+        self.cmd_vel_pub = rospy.Publisher('/nav_vel', Twist, queue_size=1)
+
+        self.grab_object = rospy.ServiceProxy('/set_object_grabber', SetObjectGrabber())
+
+    def execute(self, goal):
+        rospy.loginfo("Pick up parcel action started")
+
+        success = True
+        self.feedback = QuadrotorPickUpParcelFeedback()
+        self.result = QuadrotorPickUpParcelResult()
+
+        height = 1.0
+
+        rate = rospy.Rate(20)
+
+        pallet_picked_up = False
+        going_down = True
+        going_up = False
+
+        initial_height = None
+        pick_up_height = 0.46
+
+        while not pallet_picked_up:
+
+            if self.server.is_preempt_requested():
+                rospy.loginfo('Pick up parcel action preempted')
+                self.server.set_preempted()
+                success = False
+                break
+
+            try:
+                (trans, rot) = self.tf_listener.lookupTransform(
+                    'map', 'base_link', rospy.Time(0))
+
+                height = trans[2]
+                if initial_height is None:
+                    initial_height = height
+
+                if height < pick_up_height:
+                    try:
+                        self.grab_object(SetObjectGrabberRequest(True))
+                    except rospy.ServiceException, e:
+                        rospy.logwarn('Service call failed: %s', e)
+
+                    going_down = False
+                    going_up = True
+
+                if height > initial_height and going_up:
+                    pallet_picked_up = True
+                    going_down = False
+                    going_up = False
+                    cmd_vel_msg = Twist()
+
+                if going_down:
+                    cmd_vel_msg = Twist()
+                    cmd_vel_msg.linear.z = -0.1
+                elif going_up:
+                    cmd_vel_msg = Twist()
+                    cmd_vel_msg.linear.z = 0.1
+                else:
+                    cmd_vel_msg = Twist()
+
+                self.cmd_vel_pub.publish(cmd_vel_msg)
+
+                rate.sleep()
+
+            except (tf_spec.Exception, tf_spec.ConnectivityException, tf_spec.LookupException):
+                rospy.logdebug("TF Exception")
+                self.cmd_vel_pub.publish(Twist())
+                break
+
+        # Stop quadrotor
+        self.cmd_vel_pub.publish(Twist())
+
+        if success:
+            rospy.loginfo('Pick up parcel action succeeded')
+            self.server.set_succeeded(self.result)
+
+
+if __name__ == '__main__':
+    rospy.init_node('pick_up_parcel_action')
+    server = PickUpParcel()
+    rospy.spin()

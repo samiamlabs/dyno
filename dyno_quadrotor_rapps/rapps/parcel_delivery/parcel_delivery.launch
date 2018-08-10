@@ -1,3 +1,8 @@
 <launch>
-  <include file="$(find dyno_behaviours)/launch/drone_parcel_delivery.launch"/>
+  <include file="$(find dyno_behaviours)/launch/quadrotor_parcel_delivery.launch"/>
+
+  <!-- Actions -->
+  <node pkg="dyno_behaviours" name="pick_up_parcel_action" type="quadrotor_pick_up_parcel_action"/>
+  <node pkg="dyno_behaviours" name="drop_off_parcel_action" type="quadrotor_drop_off_parcel_action"/>
+
 </launch>
