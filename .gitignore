@@ -1,2 +1,5 @@
 *.pyc
 dyno_localization/states/last_state.pbstream
+dyno_world_state/node_modules
+dyno_world_state/yarn.lock
+dyno_world_state/yarn-error.log

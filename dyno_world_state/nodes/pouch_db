@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+/*
+  License: BSD
+  https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+*/
+
+'use strict';
+
+require("babel-register");
+require("../src/pouch_main");
