@@ -1,5 +1,5 @@
 # Define the goal
-float64 parcel_height
+string object_name
 ---
 # Define the result
 float64 duration

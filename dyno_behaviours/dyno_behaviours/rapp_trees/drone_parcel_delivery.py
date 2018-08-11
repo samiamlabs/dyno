@@ -137,14 +137,14 @@ def create_root():
         action_goal=move_base_msgs.MoveBaseGoal()
     )
 
-    pick_up_parcel = py_trees_ros.actions.ActionClient(
+    pick_up_parcel = drone_parcel_delivery_behaviours.PickUpParcel(
         name="Pick up parcel",
         action_namespace="/pick_up_parcel",
         action_spec=dyno_msgs.QuadrotorPickUpParcelAction,
         action_goal=dyno_msgs.QuadrotorPickUpParcelGoal()
     )
 
-    drop_off_parcel = py_trees_ros.actions.ActionClient(
+    drop_off_parcel = drone_parcel_delivery_behaviours.DropOffParcel(
         name="Drop off parcel",
         action_namespace="/drop_off_parcel",
         action_spec=dyno_msgs.QuadrotorPickUpParcelAction,
@@ -206,8 +206,8 @@ class SplinteredReality(object):
             self.report_publisher.publish("Moving to next location")
         elif tree.tip().name == "Pick up parcel":
             self.report_publisher.publish("Picking up parcel")
-        elif tree.tip().name == "Dropping off parcel":
-            self.report_publisher.publish("Drop off parcel")
+        elif tree.tip().name == "Drop off parcel":
+            self.report_publisher.publish("Dropping off parcel")
         else:
             self.report_publisher.publish("Idle, press start to move")
 

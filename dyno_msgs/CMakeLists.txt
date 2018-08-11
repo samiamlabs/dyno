@@ -28,6 +28,7 @@ add_service_files(
     AddCurrentLocation.srv
     GetObjects.srv
     SetObjectGrabber.srv
+    SetObjectMoving.srv
 )
 
 add_action_files(

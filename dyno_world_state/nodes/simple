@@ -32,6 +32,7 @@ class SimpleWorldState:
 
         self.location_dict = {}
         self.object_dict = {}
+        self.moving_object_name = None
 
         self.unique_id_counter = 1000
 
@@ -75,6 +76,9 @@ class SimpleWorldState:
 
         self.load_state_service = rospy.Service(
             '/world_state/load_objects', Empty, self.handle_load_objects)
+
+        self.set_object_moving_service = rospy.Service(
+            '/world_state/set_object_moving', SetObjectMoving, self.handle_set_object_moving)
 
 
     def handle_add_current_pose(self, request):
@@ -157,6 +161,35 @@ class SimpleWorldState:
             rospy.logwarn('Service call failed: %s', e)
 
         return EmptyResponse()
+
+    def handle_set_object_moving(self, request):
+        if request.is_moving:
+            if request.object_name in self.object_dict:
+                rospy.loginfo("Adding object: %s to moving", request.object_name)
+                self.moving_object_name = request.object_name
+            else:
+                rospy.logwarn("Failed adding to moving, object: %s is not known", request.object_name)
+        else:
+            if request.object_name == self.moving_object_name:
+                rospy.loginfo("Removing object %s from moving and setting new map pose", request.object_name)
+                self.moving_object_name = None
+                # FIXME: refactor, handle z?
+                object_pose = self.object_dict[request.object_name].pose
+                object_pose.position.x = self.current_pose.pose.position.x
+                object_pose.position.y = self.current_pose.pose.position.y
+                object_marker = self.object_dict[request.object_name].marker
+                object_marker.pose.position.x = object_pose.position.x
+                object_marker.pose.position.y = object_pose.position.y
+                object_marker.pose.orientation = self.current_pose.pose.orientation
+                object_label = self.object_dict[request.object_name].label
+                object_label.pose.position.x = object_pose.position.x
+                object_label.pose.position.y = object_pose.position.y
+                object_label.pose.orientation = self.current_pose.pose.orientation
+
+            else:
+                rospy.logwarn("Failed at removing from moving, object: %s is not moving", request.object_name)
+
+        return SetObjectMovingResponse(True)
 
     def init_subscribers(self):
         rospy.Subscriber("/robot_pose", PoseStamped,
@@ -375,8 +408,19 @@ class SimpleWorldState:
             marker_array_msg.markers.append(self.location_dict[key].label)
 
         for key in self.object_dict:
-            marker_array_msg.markers.append(self.object_dict[key].marker)
-            marker_array_msg.markers.append(self.object_dict[key].label)
+            if key != self.moving_object_name:
+                marker_array_msg.markers.append(self.object_dict[key].marker)
+                marker_array_msg.markers.append(self.object_dict[key].label)
+            else:
+                moving_marker = deepcopy(self.object_dict[key].marker)
+                moving_marker.pose = deepcopy(self.current_pose.pose)
+                moving_marker.pose.position.z -= 0.3
+                marker_array_msg.markers.append(moving_marker)
+
+                moving_marker_label = deepcopy(self.object_dict[key].label)
+                moving_marker_label.pose = deepcopy(self.current_pose.pose)
+                moving_marker_label.pose.position.z += 0.3
+                marker_array_msg.markers.append(moving_marker_label)
 
         self.marker_pub.publish(marker_array_msg)
 
@@ -386,7 +430,7 @@ if __name__ == '__main__':
 
     simple_world_state = SimpleWorldState()
 
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         simple_world_state.update()
         simple_world_state.publish()

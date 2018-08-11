@@ -36,6 +36,7 @@ class PickUpParcel:
         self.cmd_vel_pub = rospy.Publisher('/nav_vel', Twist, queue_size=1)
 
         self.grab_object = rospy.ServiceProxy('/set_object_grabber', SetObjectGrabber())
+        self.set_object_moving = rospy.ServiceProxy('/world_state/set_object_moving', SetObjectMoving())
 
     def execute(self, goal):
         rospy.loginfo("Pick up parcel action started")
@@ -54,6 +55,7 @@ class PickUpParcel:
 
         initial_height = None
         pick_up_height = 0.46
+        speed = 0.2
 
         while not pallet_picked_up:
 
@@ -74,6 +76,7 @@ class PickUpParcel:
                 if height < pick_up_height:
                     try:
                         self.grab_object(SetObjectGrabberRequest(True))
+                        self.set_object_moving(SetObjectMovingRequest(goal.object_name, True))
                     except rospy.ServiceException, e:
                         rospy.logwarn('Service call failed: %s', e)
 
@@ -88,10 +91,10 @@ class PickUpParcel:
 
                 if going_down:
                     cmd_vel_msg = Twist()
-                    cmd_vel_msg.linear.z = -0.1
+                    cmd_vel_msg.linear.z = -speed
                 elif going_up:
                     cmd_vel_msg = Twist()
-                    cmd_vel_msg.linear.z = 0.1
+                    cmd_vel_msg.linear.z = speed
                 else:
                     cmd_vel_msg = Twist()
 

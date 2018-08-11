@@ -161,3 +161,31 @@ class MoveToNextObject(py_trees_ros.actions.ActionClient):
 
         self.action_goal.target_pose = pose_stamped
         self.sent_goal = False
+
+
+class PickUpParcel(py_trees_ros.actions.ActionClient):
+    def initialise(self):
+        """
+        Reset the internal variables.
+        """
+        self.logger.debug("{0}.initialise()".format(self.__class__.__name__))
+
+        blackboard = py_trees.blackboard.Blackboard()
+
+        delivery_queue = blackboard.delivery_queue
+        self.action_goal.object_name = delivery_queue[0].object_name
+        self.sent_goal = False
+
+
+class DropOffParcel(py_trees_ros.actions.ActionClient):
+    def initialise(self):
+        """
+        Reset the internal variables.
+        """
+        self.logger.debug("{0}.initialise()".format(self.__class__.__name__))
+
+        blackboard = py_trees.blackboard.Blackboard()
+
+        delivery_queue = blackboard.delivery_queue
+        self.action_goal.object_name = delivery_queue[0].object_name
+        self.sent_goal = False
