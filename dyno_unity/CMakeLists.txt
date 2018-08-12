@@ -31,5 +31,3 @@ target_link_libraries(clock_sync ${catkin_LIBRARIES})
 
 add_executable(clock src/clock.cpp)
 target_link_libraries(clock ${catkin_LIBRARIES})
-
-catkin_package()
