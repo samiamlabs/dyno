@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find dyno_world_state)/launch/simple.launch"/>
+    <include file="$(find dyno_planning)/launch/quadrotor_visit_all.launch"/>
+    
+    <!-- visualisation -->
+  	<!--
+  	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rosplan_demos)/rviz/turtlebot.rviz">
+  	</node>
+   -->
+</launch>

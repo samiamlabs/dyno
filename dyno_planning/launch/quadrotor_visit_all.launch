@@ -1,0 +1,30 @@
+<launch>
+
+ 	<!-- Dyno world state interface -->
+  <node name="rosplan_world_state_interface" pkg="dyno_planning" type="world_state_interface"/>
+
+	<!-- ROSPlan -->
+	<include file="$(find dyno_planning)/launch/interfaced_planning_system.launch" >
+		<arg name="domain_path"		value="$(find dyno_planning)/pddl/domain_quadrotor_visit_all.pddl" />
+	</include>
+
+
+	<!-- movebase interface -->
+	<!--
+	<node name="rosplan_interface_movebase" pkg="rosplan_interface_movebase" type="rpmovebase" respawn="false" output="log">
+		<param name="knowledge_base" value="rosplan_knowledge_base" />
+		<param name="action_server" value="/move_base" />
+		<param name="pddl_action_name" value="goto_waypoint" />
+		<param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
+		<param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
+	</node>
+	 -->
+<!-- 
+	<include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
+		<arg name="pddl_action_name" value="goto_waypoint" />
+		<arg name="action_duration" value="45" />
+	</include>
+ -->
+	 <node name="rp_waypoint_navigation_action" pkg="dyno_planning" type="waypoint_navigation_action"/>
+
+</launch>

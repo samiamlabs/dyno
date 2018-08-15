@@ -13,12 +13,16 @@ add_message_files(
   DIRECTORY
     msg
   FILES
+    Delivery.msg
+    DeliveryArray.msg
     Location.msg
     LocationArray.msg
     Object.msg
     ObjectArray.msg
-    Delivery.msg
-    DeliveryArray.msg
+    Robot.msg
+    RobotArray.msg
+    RobotAtLocation.msg
+    WorldStateEvent.msg
 )
 
 add_service_files(
@@ -26,7 +30,10 @@ add_service_files(
     srv
   FILES
     AddCurrentLocation.srv
+    GetLocations.srv
     GetObjects.srv
+    GetRobots.srv
+    GetRobotsAtLocations.srv
     SetObjectGrabber.srv
     SetObjectMoving.srv
 )

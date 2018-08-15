@@ -27,7 +27,8 @@ class OdomBroadcaster:
         odom_time = odometry_msg.header.stamp
 
         # Post date to prevent lookup errors in TEB and similar stuff
-        odom_time -= rospy.Duration.from_sec(0.1)
+        if odom_time.to_sec() > 0.1:
+            odom_time -= rospy.Duration.from_sec(0.1)
 
         (odom_translation, odom_rotation) = pm.toTf(pm.fromMsg(odometry_msg.pose.pose))
 

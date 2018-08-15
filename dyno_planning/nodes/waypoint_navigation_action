@@ -1,0 +1,169 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+import dyno_msgs.msg as dyno_msgs
+import rosplan_dispatch_msgs.msg as rosplan_dispatch_msgs
+
+from rosplan_knowledge_msgs.srv import *
+from rosplan_knowledge_msgs.msg import *
+
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import PoseStamped
+
+from dyno_msgs.srv import GetLocations, GetLocationsRequest, GetLocationsResponse
+
+
+class WaypointNavigationAction:
+    def __init__(self):
+        rospy.init_node('rp_waypoint_navigation_action')
+
+        self.knowledge_base = 'rosplan_knowledge_base'
+        self.pddl_action_name = 'goto_waypoint'
+        self.action_dispatch_topic = '/rosplan_plan_dispatcher/action_dispatch'
+        self.action_feedback_topic = '/rosplan_plan_dispatcher/action_feedback'
+
+        self.init_publishers()
+        self.init_subscribers()
+
+    def init_publishers(self):
+        self.action_feedback_pub = rospy.Publisher(self.action_feedback_topic,
+                                                   rosplan_dispatch_msgs.ActionFeedback)
+
+        topic_name = '/move_base_simple/goal'
+        self.move_base_pub = rospy.Publisher(topic_name, PoseStamped)
+
+    def init_subscribers(self):
+        rospy.Subscriber(self.action_dispatch_topic,
+                         rosplan_dispatch_msgs.ActionDispatch,
+                         self.action_dispatch_callback)
+
+    def action_dispatch_callback(self, action_dispatch_msg):
+        action_feedback_msg = rosplan_dispatch_msgs.ActionFeedback()
+        action_feedback_msg.action_id = action_dispatch_msg.action_id
+
+        operator_details = self.try_get_domain_operator_details('goto_waypoint')
+
+        # TODO: handle start effects
+
+        if action_dispatch_msg.name != self.pddl_action_name:
+            return
+
+        parameter_dict = dict((p.key, p.value) for p in action_dispatch_msg.parameters)
+
+        locations = self.try_get_locations().locations
+        location_dict = dict((l.name, l.pose) for l in locations)
+
+        if 'to' in parameter_dict and parameter_dict['to'] in location_dict:
+            goal_msg = PoseStamped()
+            goal_msg.header.frame_id = 'map'
+            goal_msg.header.stamp = rospy.Time.now()
+            goal_msg.pose = location_dict[parameter_dict['to']]
+            rospy.loginfo("Publishing move base goal, to: %s", parameter_dict['to'])
+
+            # Use simple topic move_base interface for dyno multi_robot_navigation compatability
+            self.move_base_pub.publish(goal_msg)
+
+            action_feedback_msg.status = "action enabled"
+            self.action_feedback_pub.publish(action_feedback_msg)
+        else:
+            rospy.logwarn("To waypoint pose not found")
+            # Publish action failed
+            action_feedback_msg.status = "action failed"
+            self.action_feedback_pub.publish(action_feedback_msg)
+            return
+
+        goal_reached = False
+
+        # TODO: add timeout?
+        while not goal_reached:
+            rospy.sleep(0.1)
+            query_response = self.try_query_state('robot_at', parameter_dict['v'], parameter_dict['to'])
+            goal_reached = query_response.results[0]
+            rospy.loginfo(query_response)
+
+        # Handle at end add effects
+        for predicate in operator_details.at_end_add_effects:
+            if predicate.name == 'robot_at':
+                continue  # Handled by dyno world state interface
+
+            for parameter in predicate.typed_parameters:
+                parameter.value = parameter_dict[parameter.key]
+
+            self.try_update_knowledge(predicate.name, predicate.typed_parameters)
+
+        # TODO: Handle at end remove effects
+
+        action_feedback_msg.status = "action achieved"
+        self.action_feedback_pub.publish(action_feedback_msg)
+
+    def try_get_locations(self):
+        service_name = '/world_state/get_locations'
+        rospy.wait_for_service(service_name)
+        update_knowledge = rospy.ServiceProxy(service_name, GetLocations)
+        request = GetLocationsRequest()
+        response = GetLocationsResponse()
+        try:
+            response = update_knowledge(request)
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response
+
+    def try_query_state(self, attribute_name, robot_name, location_name):
+        service_name = '/' + self.knowledge_base + '/query_state'
+        rospy.wait_for_service(service_name)
+        query_state = rospy.ServiceProxy(service_name, KnowledgeQueryService)
+        request = KnowledgeItem()
+        request.knowledge_type = KnowledgeItem.FACT
+        request.attribute_name = attribute_name
+        request.values.append( diagnostic_msgs.msg.KeyValue(key='v',value=robot_name))
+        request.values.append( diagnostic_msgs.msg.KeyValue(key='wp',value=location_name))
+
+        response = KnowledgeQueryServiceResponse()
+        try:
+            response = query_state([request])
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response
+
+    def try_get_domain_operator_details(self, name):
+        service_name = '/' + self.knowledge_base + '/domain/operator_details'
+        rospy.wait_for_service(service_name)
+        get_domain_operator_details = rospy.ServiceProxy(service_name, GetDomainOperatorDetailsService)
+        request = GetDomainOperatorDetailsServiceRequest()
+        request.name = name
+        response = GetDomainOperatorDetailsServiceResponse()
+        try:
+            response = get_domain_operator_details(request)
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response.op
+
+    def try_update_knowledge(self, attribute_name, key_values):
+        service_name = '/' + self.knowledge_base + '/update'
+
+        request = KnowledgeUpdateServiceRequest()
+        request.update_type = KnowledgeUpdateServiceRequest.ADD_KNOWLEDGE
+        request.knowledge.knowledge_type = KnowledgeItem.FACT
+        request.knowledge.attribute_name = attribute_name
+        request.knowledge.values = key_values
+
+        rospy.wait_for_service(service_name)
+        try:
+            response = rospy.ServiceProxy(service_name, KnowledgeUpdateService)(request)
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+
+if __name__ == '__main__':
+    try:
+        waypointNavigationAction = WaypointNavigationAction()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

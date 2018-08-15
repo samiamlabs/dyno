@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dyno_planning</name>
+  <version>0.0.0</version>
+  <description>The dyno_planning package</description>
+
+  <maintainer email="samuel@dynorobotics.se">Samuel Lindgren</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>mongodb_store</depend>
+  <depend>tf2_bullet</depend>
+  <depend>freeglut3_dev</depend>
+  <depend>rosplan_planning_system</depend>
+
+  <export>
+  </export>
+</package>

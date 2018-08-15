@@ -1,0 +1,2 @@
+string robot_name
+string location_name
