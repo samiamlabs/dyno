@@ -19,6 +19,7 @@ add_message_files(
     LocationArray.msg
     Object.msg
     ObjectArray.msg
+    ObjectAtLocation.msg
     Robot.msg
     RobotArray.msg
     RobotAtLocation.msg
@@ -32,6 +33,7 @@ add_service_files(
     AddCurrentLocation.srv
     GetLocations.srv
     GetObjects.srv
+    GetObjectsAtLocations.srv
     GetRobots.srv
     GetRobotsAtLocations.srv
     SetObjectGrabber.srv

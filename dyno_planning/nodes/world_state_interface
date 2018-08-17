@@ -6,7 +6,7 @@
 import rospy
 import dyno_msgs.msg as dyno_msgs
 import std_srvs.srv as std_srvs
-from dyno_msgs.srv import GetRobotsAtLocations, GetRobotsAtLocationsResponse
+from dyno_msgs.srv import GetRobotsAtLocations, GetRobotsAtLocationsResponse, GetObjectsAtLocations, GetObjectsAtLocationsResponse, GetObjects, GetObjectsRequest, GetLocations, GetLocationsRequest
 
 from rosplan_knowledge_msgs.srv import *
 from rosplan_knowledge_msgs.msg import *
@@ -15,11 +15,15 @@ import diagnostic_msgs.msg as diagnostic_msgs
 
 from collections import namedtuple
 
+
 class ROSPlanWorldStateInterface:
     def __init__(self):
         rospy.init_node('rosplan_world_state_interface')
 
         self.master_name = rospy.get_param("/rocon/master/name", "dyno")
+
+        # self.problem_name = 'quadrotor_visit_all'
+        self.problem_name = 'quadrotor_deliver_parcels'
 
         self.location_dict = {}
 
@@ -50,6 +54,10 @@ class ROSPlanWorldStateInterface:
             'dyno_plan/add_locations', std_srvs.Empty, self.handle_add_locations
         )
 
+        self.add_locations_service = rospy.Service(
+            'dyno_plan/add_objects', std_srvs.Empty, self.handle_add_objects
+        )
+
         self.add_goals_service = rospy.Service(
             'dyno_plan/add_goals', std_srvs.Empty, self.handle_add_goals
         )
@@ -70,6 +78,7 @@ class ROSPlanWorldStateInterface:
 
         self.handle_add_robots(std_srvs.EmptyRequest())
         self.handle_add_locations(std_srvs.EmptyRequest())
+        self.handle_add_objects(std_srvs.EmptyRequest())
 
         self.update_predicates()
 
@@ -126,26 +135,58 @@ class ROSPlanWorldStateInterface:
             request = KnowledgeUpdateServiceRequest()
             request.update_type = KnowledgeUpdateServiceRequest.ADD_KNOWLEDGE
             request.knowledge.knowledge_type = KnowledgeItem.INSTANCE
-            request.knowledge.instance_type = "waypoint"
+            request.knowledge.instance_type = 'waypoint'
             request.knowledge.instance_name = self.location_dict[key].name
+            self.try_update_knowledge(request)
+
+        return std_srvs.EmptyResponse()
+
+    def handle_add_objects(self, request):
+        objects = self.try_get_objects()
+
+        request = KnowledgeUpdateServiceArrayRequest()
+        request.update_type = []
+
+        for object in objects:
+            request = KnowledgeUpdateServiceRequest()
+            request.update_type = KnowledgeUpdateServiceRequest.ADD_KNOWLEDGE
+            request.knowledge.knowledge_type = KnowledgeItem.INSTANCE
+            request.knowledge.instance_type = object.type
+            request.knowledge.instance_name = object.name
             self.try_update_knowledge(request)
 
         return std_srvs.EmptyResponse()
 
     def handle_add_goals(self, request):
         # All waypoints visited
-        for key in self.location_dict:
-            request = KnowledgeUpdateServiceRequest()
-            request.update_type = KnowledgeUpdateServiceRequest.ADD_GOAL
-            request.knowledge.knowledge_type = KnowledgeItem.FACT
-            request.knowledge.attribute_name = "visited"
-            keyValue = diagnostic_msgs.KeyValue()
-            keyValue.key = 'wp'
-            keyValue.value = key
-            request.knowledge.values = [keyValue]
-            request.knowledge.function_value = 0.0
+        if self.problem_name == 'quadrotor_visit_all':
+            for key in self.location_dict:
+                request = KnowledgeUpdateServiceRequest()
+                request.update_type = KnowledgeUpdateServiceRequest.ADD_GOAL
+                request.knowledge.knowledge_type = KnowledgeItem.FACT
+                request.knowledge.attribute_name = "visited"
+                keyValue = diagnostic_msgs.KeyValue()
+                keyValue.key = 'wp'
+                keyValue.value = key
+                request.knowledge.values = [keyValue]
+                request.knowledge.function_value = 0.0
 
-            self.try_update_knowledge(request)
+                self.try_update_knowledge(request)
+
+        elif self.problem_name == 'quadrotor_deliver_parcels':
+            objects = self.try_get_objects()
+            locations = self.try_get_locations()
+            for object, location in zip(objects, locations):
+                request = KnowledgeUpdateServiceRequest()
+                request.update_type = KnowledgeUpdateServiceRequest.ADD_GOAL
+                request.knowledge.knowledge_type = KnowledgeItem.FACT
+                request.knowledge.attribute_name = "parcel_at"
+                location_key_value = diagnostic_msgs.KeyValue(key='wp', value=location.name)
+                parcel_key_value = diagnostic_msgs.KeyValue(key='p', value=object.name)
+                request.knowledge.values = [parcel_key_value, location_key_value]
+                request.knowledge.function_value = 0.0
+
+                self.try_update_knowledge(request)
 
         return std_srvs.EmptyResponse()
 
@@ -182,9 +223,15 @@ class ROSPlanWorldStateInterface:
 
     def event_callback(self, event_msg):
         if event_msg.type == 'robots_at_locations':
-            self.update_predicates()
+            self.update_robot_at()
+        if event_msg.type == 'objects_at_locations':
+            self.update_parcel_at()
 
     def update_predicates(self):
+        self.update_robot_at()
+        self.update_parcel_at()
+
+    def update_robot_at(self):
         # Robots at waypoints
         robots_at_locations = self.try_get_robots_at_locations()
 
@@ -213,6 +260,42 @@ class ROSPlanWorldStateInterface:
 
         self.try_update_array(request)
 
+    def update_parcel_at(self):
+        # Objects at waypoints
+        # FIXME: Only add entries not in db to prevent warnings
+        objects = self.try_get_objects()
+        locations = self.try_get_locations()
+        objects_at_locations = self.try_get_objects_at_locations()
+
+        request = KnowledgeUpdateServiceArrayRequest()
+        request.update_type = []
+
+        for object in objects:
+            if object.type != 'parcel':
+                continue
+
+            for location in locations:
+                knowledge = KnowledgeItem()
+                knowledge.knowledge_type = KnowledgeItem.FACT
+                knowledge.attribute_name = "parcel_at"
+                object_key_value = diagnostic_msgs.KeyValue(key='p', value=object.name)
+                waypoint_key_value = diagnostic_msgs.KeyValue(key='wp', value=location.name)
+                knowledge.values.append(object_key_value)
+                knowledge.values.append(waypoint_key_value)
+
+                should_add = False
+                for object_at_location in objects_at_locations:
+                    if object_at_location.object_name == object.name and object_at_location.location_name == location.name:
+                        should_add = True
+                if should_add:
+                    request.update_type.append(KnowledgeUpdateServiceRequest.ADD_KNOWLEDGE)
+                else:
+                    request.update_type.append(KnowledgeUpdateServiceRequest.REMOVE_KNOWLEDGE)
+
+                request.knowledge.append(knowledge)
+
+        self.try_update_array(request)
+
     def try_get_robots_at_locations(self):
         service_name = '/world_state/get_robots_at_locations'
         response = GetRobotsAtLocationsResponse()
@@ -223,6 +306,39 @@ class ROSPlanWorldStateInterface:
             rospy.logwarn('Service call failed: %s', e)
 
         return response.robots_at_locations
+
+    def try_get_objects_at_locations(self):
+        service_name = '/world_state/get_objects_at_locations'
+        response = GetObjectsAtLocationsResponse()
+        rospy.wait_for_service(service_name)
+        try:
+            response = rospy.ServiceProxy(service_name, GetObjectsAtLocations)()
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response.objects_at_locations
+
+    def try_get_objects(self):
+        service_name = '/world_state/get_objects'
+        response = GetObjectsRequest()
+        rospy.wait_for_service(service_name)
+        try:
+            response = rospy.ServiceProxy(service_name, GetObjects)()
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response.objects
+
+    def try_get_locations(self):
+        service_name = '/world_state/get_locations'
+        response = GetLocationsRequest()
+        rospy.wait_for_service(service_name)
+        try:
+            response = rospy.ServiceProxy(service_name, GetLocations)()
+        except rospy.ServiceException, e:
+            rospy.logwarn('Service call failed: %s', e)
+
+        return response.locations
 
     def try_update_array(self, request):
         service_name = '/rosplan_knowledge_base/update_array'

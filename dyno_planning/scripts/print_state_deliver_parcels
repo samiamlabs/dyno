@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+import dyno_msgs.msg as dyno_msgs
+from dyno_msgs.srv import *
+
+from rosplan_knowledge_msgs.srv import *
+from rosplan_knowledge_msgs.msg import *
+
+import diagnostic_msgs.msg as diagnostic_msgs
+
+knowledge_base = 'rosplan_knowledge_base'
+
+def try_get_domain_operator_details(name):
+    service_name = '/' + knowledge_base + '/domain/operator_details'
+    rospy.wait_for_service(service_name)
+    get_domain_operator_details = rospy.ServiceProxy(service_name, GetDomainOperatorDetailsService)
+    request = GetDomainOperatorDetailsServiceRequest()
+    request.name = name
+    response = GetDomainOperatorDetailsServiceResponse()
+    try:
+        response = get_domain_operator_details(request)
+    except rospy.ServiceException, e:
+        rospy.logwarn('Service call failed: %s', e)
+
+    return response.op
+
+def try_get_locations():
+    service_name = '/world_state/get_locations'
+    rospy.wait_for_service(service_name)
+    get_locations = rospy.ServiceProxy(service_name, GetLocations)
+    request = GetLocationsRequest()
+    response = GetLocationsResponse()
+    try:
+        response = get_locations(request)
+    except rospy.ServiceException, e:
+        rospy.logwarn('Service call failed: %s', e)
+
+    return response.locations
+
+
+def try_get_robots():
+    service_name = '/world_state/get_robots'
+    rospy.wait_for_service(service_name)
+    get_robots = rospy.ServiceProxy(service_name, GetRobots)
+    request = GetRobotsRequest()
+    response = GetRobotsResponse()
+    try:
+        response = get_robots(request)
+    except rospy.ServiceException, e:
+        rospy.logwarn('Service call failed: %s', e)
+
+    return response.robots
+
+
+def try_get_objects():
+    service_name = '/world_state/get_objects'
+    rospy.wait_for_service(service_name)
+    request = GetObjectsRequest()
+    response = GetObjectsResponse()
+    get_objects = rospy.ServiceProxy(service_name, GetObjects)
+    try:
+        response = get_objects(request)
+    except rospy.ServiceException, e:
+        rospy.logwarn('Service call failed: %s', e)
+
+    return response.objects
+
+
+def try_query_state(request_list):
+    service_name = '/' + knowledge_base + '/query_state'
+    rospy.wait_for_service(service_name)
+    query_state = rospy.ServiceProxy(service_name, KnowledgeQueryService)
+
+    response = KnowledgeQueryServiceResponse()
+    try:
+        response = query_state(request_list)
+    except rospy.ServiceException, e:
+        rospy.logwarn('Service call failed: %s', e)
+
+    return response
+
+
+def print_state():
+    locations = try_get_locations()
+    robots = try_get_robots()
+    objects = try_get_objects()
+
+    # -------Robot At-------
+    request_list = []
+    for robot in robots:
+        for location in locations:
+            knowledge = KnowledgeItem()
+            knowledge.knowledge_type = KnowledgeItem.FACT
+            knowledge.attribute_name = 'robot_at'
+            robot_key_value = diagnostic_msgs.KeyValue(key='v', value=robot.name)
+            knowledge.values.append(robot_key_value)
+            waypoint_key_value = diagnostic_msgs.KeyValue(key='wp', value=location.name)
+            knowledge.values.append(waypoint_key_value)
+            request_list.append(knowledge)
+
+    query_responses = try_query_state(request_list)
+
+    print "'\n----- Robots at Waypoints -----"
+    for index, request in enumerate(request_list):
+        robot_name = request.values[0].value
+        location_name = request.values[1].value
+        state = query_responses.results[index]
+        print('{} at {:<7s} [{}]'.format(robot_name, location_name, state))
+
+    # -------Parcel At-------
+    request_list = []
+    for object in objects:
+        if object.type != 'parcel':
+            continue
+
+        for location in locations:
+            knowledge = KnowledgeItem()
+            knowledge.knowledge_type = KnowledgeItem.FACT
+            knowledge.attribute_name = 'parcel_at'
+            object_key_value = diagnostic_msgs.KeyValue(key='v', value=object.name)
+            knowledge.values.append(object_key_value)
+            waypoint_key_value = diagnostic_msgs.KeyValue(key='wp', value=location.name)
+            knowledge.values.append(waypoint_key_value)
+            request_list.append(knowledge)
+
+    query_responses = try_query_state(request_list)
+
+    print "'\n----- Objects at Waypoints -----"
+    for index, request in enumerate(request_list):
+        object_name = request.values[0].value
+        location_name = request.values[1].value
+        state = query_responses.results[index]
+        print('{} at {:<10s} [{}]'.format(object_name, location_name, state))
+
+
+if __name__ == '__main__':
+    try:
+        print_state()
+    except rospy.ROSInterruptException:
+        pass

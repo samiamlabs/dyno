@@ -41,6 +41,7 @@ class SimpleWorldState:
         self.moving_object_name = None
 
         self.robots_at_locations = []
+        self.objects_at_locations = []
 
         self.unique_id_counter = 1000
 
@@ -57,6 +58,7 @@ class SimpleWorldState:
 
         self.handle_load_state(None)
         self.handle_load_objects(None)
+        self.update_predicates()
 
     def init_services(self):
         # Locations
@@ -100,9 +102,18 @@ class SimpleWorldState:
         self.get_robots_at_locations = rospy.Service(
             '/world_state/get_robots_at_locations', GetRobotsAtLocations, self.handle_get_robots_at_locations)
 
+        self.get_objects_at_locations = rospy.Service(
+            '/world_state/get_objects_at_locations', GetObjectsAtLocations, self.handle_get_objects_at_locations)
+
     def handle_get_robots_at_locations(self, request):
         response = GetRobotsAtLocationsResponse()
         response.robots_at_locations = self.robots_at_locations
+        return response
+
+    def handle_get_objects_at_locations(self, request):
+        self.update_predicates()
+        response = GetObjectsAtLocationsResponse()
+        response.objects_at_locations = self.objects_at_locations
         return response
 
     def update_robots_at_locations(self):
@@ -135,6 +146,34 @@ class SimpleWorldState:
 
         self.robots_at_locations = response.robots_at_locations
 
+    def update_objects_at_locations(self):
+        in_location_cutoff_distance = 0.2
+
+        response = GetObjectsAtLocationsResponse()
+        for location_name, location_tuple in self.location_dict.items():
+            location_position = location_tuple.pose_stamped.pose.position
+            location_point_2d = np.array([location_position.x, location_position.y])
+            for object_name, object_tuple in self.object_dict.items():
+                object_position = object_tuple.pose.position
+                object_point_2d = np.array([object_position.x, object_position.y])
+                distance_to_object = np.linalg.norm(location_point_2d - object_point_2d)
+                if distance_to_object < in_location_cutoff_distance:
+                    object_at_location = ObjectAtLocation(object_name=object_name, location_name=location_name)
+                    response.objects_at_locations.append(object_at_location)
+
+        changed = False
+        if len(self.objects_at_locations) == len(response.objects_at_locations):
+            for last, current in zip(self.objects_at_locations, response.objects_at_locations):
+                if last.object_name != current.object_name or last.location_name != current.location_name:
+                    changed = True
+                    break
+        else:
+            changed = True
+
+        if changed:
+            self.publish_event('objects_at_locations')
+
+        self.objects_at_locations = response.objects_at_locations
 
     def handle_get_locations(self, request):
         response = GetLocationsResponse()
@@ -262,6 +301,7 @@ class SimpleWorldState:
             else:
                 rospy.logwarn("Failed at removing from moving, object: %s is not moving", request.object_name)
 
+        self.update_predicates()
         return SetObjectMovingResponse(True)
 
     def init_subscribers(self):
@@ -286,6 +326,7 @@ class SimpleWorldState:
         self.event_pub.publish(event_msg)
 
     def current_pose_callback(self, pose_msg):
+        # FIXME: Filter out small changes in pose
         self.last_pose = self.current_pose
         self.current_pose = pose_msg
 
@@ -295,6 +336,7 @@ class SimpleWorldState:
 
     def update_predicates(self):
         self.update_robots_at_locations()
+        self.update_objects_at_locations()
 
     def same_position(self, pose_1, pose_2):
         same_x = pose_1.pose.position.x == pose_2.pose.position.x
@@ -487,10 +529,11 @@ class SimpleWorldState:
 
     def create_object_array(self):
         object_array_msg = ObjectArray()
-        for key in self.object_dict:
+        for key, object in self.object_dict.items():
             object_msg = Object()
             object_msg.name = key
-            object_msg.pose = self.object_dict[key].pose
+            object_msg.type = object.type
+            object_msg.pose = object.pose
             object_array_msg.objects.append(object_msg)
         return object_array_msg
 

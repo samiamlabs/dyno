@@ -1,4 +1,4 @@
-Box Blue: !!python/object/new:__main__.ObjectTuple
+blue_box: !!python/object/new:__main__.ObjectTuple
 - &id001 !!python/object/new:geometry_msgs.msg._Pose.Pose
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
@@ -8,9 +8,9 @@ Box Blue: !!python/object/new:__main__.ObjectTuple
     - 0.15
   - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
     state:
-    - 0.0
-    - 0.0
-    - 0.0
+    - -9.11508e-08
+    - 5.171942e-08
+    - -1.85186138e-07
     - 1.0
 - parcel
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
@@ -20,11 +20,11 @@ Box Blue: !!python/object/new:__main__.ObjectTuple
     - 0
     - &id002 !!python/object/new:rospy.rostime.Time
       state:
-      - 237
-      - 590000000
+      - 18
+      - 830000000
     - map
   - objects
-  - 1008
+  - 1000
   - 1
   - 0
   - *id001
@@ -57,7 +57,7 @@ Box Blue: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - object_labels
-  - 1009
+  - 1001
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
@@ -90,11 +90,12 @@ Box Blue: !!python/object/new:__main__.ObjectTuple
         - "\0\0\0\0\0\0\0\0"
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
-        - "\0\0\0\0\0\0\0\0"
+        - !!binary |
+          lzupifLaiL4=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          AAAAAAAA8D8=
+          Zv//////7z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0
@@ -113,22 +114,22 @@ Box Blue: !!python/object/new:__main__.ObjectTuple
   - false
   - []
   - []
-  - Box Blue
+  - blue_box
   - ''
   - false
-Box Green: !!python/object/new:__main__.ObjectTuple
+green_box: !!python/object/new:__main__.ObjectTuple
 - &id004 !!python/object/new:geometry_msgs.msg._Pose.Pose
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
     state:
     - -10.55
     - 12.05
-    - 0.15
+    - 0.149999991
   - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
     state:
-    - 0.0
-    - 0.0
-    - 0.0
+    - 2.66622191e-08
+    - 1.30355915e-07
+    - 7.177357e-08
     - 1.0
 - parcel
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
@@ -139,7 +140,7 @@ Box Green: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - objects
-  - 1010
+  - 1002
   - 1
   - 0
   - *id004
@@ -172,7 +173,7 @@ Box Green: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - object_labels
-  - 1011
+  - 1003
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
@@ -181,7 +182,7 @@ Box Green: !!python/object/new:__main__.ObjectTuple
       state:
       - -10.55
       - 12.05
-      - 0.4
+      - 0.399999991
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
       - !!python/object/apply:numpy.core.multiarray.scalar
@@ -192,11 +193,12 @@ Box Green: !!python/object/new:__main__.ObjectTuple
         - "\0\0\0\0\0\0\0\0"
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
-        - "\0\0\0\0\0\0\0\0"
+        - !!binary |
+          fXnCDj5Ecz4=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          AAAAAAAA8D8=
+          6f//////7z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0
@@ -215,22 +217,22 @@ Box Green: !!python/object/new:__main__.ObjectTuple
   - false
   - []
   - []
-  - Box Green
+  - green_box
   - ''
   - false
-Box Red: !!python/object/new:__main__.ObjectTuple
+red_box: !!python/object/new:__main__.ObjectTuple
 - &id005 !!python/object/new:geometry_msgs.msg._Pose.Pose
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
     state:
     - -5.39
     - 11.97
-    - 0.15
+    - 0.150000036
   - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
     state:
-    - 0.0
-    - 0.0
-    - 0.0
+    - 3.244001e-07
+    - -6.965849e-07
+    - -2.77319373e-07
     - 1.0
 - parcel
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
@@ -241,7 +243,7 @@ Box Red: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - objects
-  - 1012
+  - 1004
   - 1
   - 0
   - *id005
@@ -274,7 +276,7 @@ Box Red: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - object_labels
-  - 1013
+  - 1005
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
@@ -283,7 +285,7 @@ Box Red: !!python/object/new:__main__.ObjectTuple
       state:
       - -5.39
       - 11.97
-      - 0.4
+      - 0.400000036
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
       - !!python/object/apply:numpy.core.multiarray.scalar
@@ -294,11 +296,12 @@ Box Red: !!python/object/new:__main__.ObjectTuple
         - "\0\0\0\0\0\0\0\0"
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
-        - "\0\0\0\0\0\0\0\0"
+        - !!binary |
+          kgemflCckr4=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          AAAAAAAA8D8=
+          pv7/////7z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0
@@ -317,22 +320,22 @@ Box Red: !!python/object/new:__main__.ObjectTuple
   - false
   - []
   - []
-  - Box Red
+  - red_box
   - ''
   - false
-Box Yellow: !!python/object/new:__main__.ObjectTuple
+yellow_box: !!python/object/new:__main__.ObjectTuple
 - &id006 !!python/object/new:geometry_msgs.msg._Pose.Pose
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
     state:
-    - 1.71
+    - 1.71000028
     - 10.76
-    - 0.15
+    - 0.150000051
   - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
     state:
-    - 0.0
-    - 0.0
-    - 0.0
+    - -5.25605458e-07
+    - 5.754045e-07
+    - -1.274129e-07
     - 1.0
 - parcel
 - !!python/object/new:visualization_msgs.msg._Marker.Marker
@@ -343,7 +346,7 @@ Box Yellow: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - objects
-  - 1014
+  - 1006
   - 1
   - 0
   - *id006
@@ -376,16 +379,16 @@ Box Yellow: !!python/object/new:__main__.ObjectTuple
     - *id002
     - map
   - object_labels
-  - 1015
+  - 1007
   - 9
   - 0
   - !!python/object/new:geometry_msgs.msg._Pose.Pose
     state:
     - !!python/object/new:geometry_msgs.msg._Point.Point
       state:
-      - 1.71
+      - 1.71000028
       - 10.76
-      - 0.4
+      - 0.400000051
     - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
       state:
       - !!python/object/apply:numpy.core.multiarray.scalar
@@ -396,11 +399,12 @@ Box Yellow: !!python/object/new:__main__.ObjectTuple
         - "\0\0\0\0\0\0\0\0"
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
-        - "\0\0\0\0\0\0\0\0"
+        - !!binary |
+          d4CBYeIZgb4=
       - !!python/object/apply:numpy.core.multiarray.scalar
         - *id003
         - !!binary |
-          AAAAAAAA8D8=
+          t///////7z8=
   - !!python/object/new:geometry_msgs.msg._Vector3.Vector3
     state:
     - 0.0
@@ -419,6 +423,6 @@ Box Yellow: !!python/object/new:__main__.ObjectTuple
   - false
   - []
   - []
-  - Box Yellow
+  - yellow_box
   - ''
   - false

@@ -1,0 +1,2 @@
+string object_name
+string location_name
