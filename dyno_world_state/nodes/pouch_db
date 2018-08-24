@@ -6,5 +6,6 @@
 
 'use strict';
 
-require("babel-register");
-require("../src/pouch_main");
+require('babel-register');
+require('babel-polyfill');
+require('../src/pouch_main');

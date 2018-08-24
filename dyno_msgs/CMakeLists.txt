@@ -35,9 +35,13 @@ add_service_files(
     GetObjects.srv
     GetObjectsAtLocations.srv
     GetRobots.srv
+    RemoveObjectsAtLocations.srv
     GetRobotsAtLocations.srv
+    SetLocations.srv
     SetObjectGrabber.srv
     SetObjectMoving.srv
+    SetObjects.srv
+    SetRobots.srv
 )
 
 add_action_files(

@@ -5,6 +5,9 @@
 #
 
 import rospy
+
+import os
+
 from std_srvs.srv import *
 
 from dyno_msgs.srv import *
@@ -25,19 +28,21 @@ import yaml
 
 from copy import deepcopy
 
-LocationTuple = namedtuple("LocationTuple", "pose_stamped, marker, label")
+LocationTuple = namedtuple("LocationTuple", "pose, marker, label")
 ObjectTuple = namedtuple("ObjectTuple", "pose, type, marker, label")
 
 
-class SimpleWorldState:
+class LocalWorldState:
     def __init__(self):
         self.master_name = rospy.get_param("/rocon/master/name", "dyno")
+        self.robot_base_type = os.getenv('DYNO_BASE', 'forklift')
 
         self.last_pose = PoseStamped()
         self.current_pose = PoseStamped()
 
         self.location_dict = {}
         self.object_dict = {}
+        self.robot_dict = {}
         self.moving_object_name = None
 
         self.robots_at_locations = []
@@ -53,26 +58,35 @@ class SimpleWorldState:
             'dyno_world_state') + '/states/save_objects.yaml'
 
         self.init_services()
-        self.init_subscribers()
         self.init_publishers()
+        self.init_subscribers()
 
         self.handle_load_state(None)
         self.handle_load_objects(None)
         self.update_predicates()
 
     def init_services(self):
+        self.clear_all_service = rospy.Service(
+            '/world_state/clear_all', Empty, self.handle_clear_all)
+
         # Locations
         self.add_current_pose_service = rospy.Service(
             '/world_state/add_current_location', AddCurrentLocation, self.handle_add_current_pose)
 
-        self.add_current_pose_service = rospy.Service(
-            '/world_state/clear_locations', Empty, self.handle_clear_poses)
+        self.clear_locations_service = rospy.Service(
+            '/world_state/clear_locations', Empty, self.handle_clear_locations)
 
         self.save_state_service = rospy.Service(
             '/world_state/save', Empty, self.handle_save_state)
 
         self.load_state_service = rospy.Service(
             '/world_state/load', Empty, self.handle_load_state)
+
+        self.get_locations_service = rospy.Service(
+            '/world_state/get_locations', GetLocations, self.handle_get_locations)
+
+        self.set_locations_service = rospy.Service(
+            '/world_state/set_locations', SetLocations, self.handle_set_locations)
 
         # Objects
         self.load_state_service = rospy.Service(
@@ -87,25 +101,34 @@ class SimpleWorldState:
         self.load_state_service = rospy.Service(
             '/world_state/load_objects', Empty, self.handle_load_objects)
 
-        self.set_object_moving_service = rospy.Service(
-            '/world_state/set_object_moving', SetObjectMoving, self.handle_set_object_moving)
-
-        self.get_locations_service = rospy.Service(
-            '/world_state/get_locations', GetLocations, self.handle_get_locations)
-
         self.get_objects_service = rospy.Service(
             '/world_state/get_objects', GetObjects, self.handle_get_objects)
+
+        self.set_objects_service = rospy.Service(
+            '/world_state/set_objects', SetObjects, self.handle_set_objects)
+
+        # Robots
+        self.clear_robots_service = rospy.Service(
+            '/world_state/clear_robots', Empty, self.handle_clear_robots)
 
         self.get_robots_service = rospy.Service(
             '/world_state/get_robots', GetRobots, self.handle_get_robots)
 
+        self.set_robots_service = rospy.Service(
+            '/world_state/set_robots', SetRobots, self.handle_set_robots)
+
+        # Predicates
         self.get_robots_at_locations = rospy.Service(
             '/world_state/get_robots_at_locations', GetRobotsAtLocations, self.handle_get_robots_at_locations)
 
         self.get_objects_at_locations = rospy.Service(
             '/world_state/get_objects_at_locations', GetObjectsAtLocations, self.handle_get_objects_at_locations)
 
+        self.set_object_moving_service = rospy.Service(
+            '/world_state/set_object_moving', SetObjectMoving, self.handle_set_object_moving)
+
     def handle_get_robots_at_locations(self, request):
+        self.update_robots_at_locations()
         response = GetRobotsAtLocationsResponse()
         response.robots_at_locations = self.robots_at_locations
         return response
@@ -120,17 +143,19 @@ class SimpleWorldState:
         in_location_cutoff_distance = 0.2
 
         response = GetRobotsAtLocationsResponse()
-        robot_position = self.current_pose.pose.position
-        robot_point_2d = np.array([robot_position.x, robot_position.y])
-        for key, location_tuple in self.location_dict.items():
-            location_position = location_tuple.pose_stamped.pose.position
-            location_point_2d = np.array([location_position.x, location_position.y])
-            distance_to_location = np.linalg.norm(robot_point_2d - location_point_2d)
-            if distance_to_location < in_location_cutoff_distance:
-                robot_in_location = RobotAtLocation()
-                robot_in_location.robot_name = 'dyno'
-                robot_in_location.location_name = key
-                response.robots_at_locations.append(robot_in_location)
+
+        for key, robot in self.robot_dict.items():
+            robot_position = robot.pose.position
+            robot_point_2d = np.array([robot_position.x, robot_position.y])
+            for key, location_tuple in self.location_dict.items():
+                location_position = location_tuple.pose.position
+                location_point_2d = np.array([location_position.x, location_position.y])
+                distance_to_location = np.linalg.norm(robot_point_2d - location_point_2d)
+                if distance_to_location < in_location_cutoff_distance:
+                    robot_in_location = RobotAtLocation()
+                    robot_in_location.robot_name = robot.name
+                    robot_in_location.location_name = key
+                    response.robots_at_locations.append(robot_in_location)
 
         changed = False
         if len(self.robots_at_locations) == len(response.robots_at_locations):
@@ -151,7 +176,7 @@ class SimpleWorldState:
 
         response = GetObjectsAtLocationsResponse()
         for location_name, location_tuple in self.location_dict.items():
-            location_position = location_tuple.pose_stamped.pose.position
+            location_position = location_tuple.pose.position
             location_point_2d = np.array([location_position.x, location_position.y])
             for object_name, object_tuple in self.object_dict.items():
                 object_position = object_tuple.pose.position
@@ -175,63 +200,47 @@ class SimpleWorldState:
 
         self.objects_at_locations = response.objects_at_locations
 
+    # Locations
     def handle_get_locations(self, request):
         response = GetLocationsResponse()
         response.locations = self.create_location_array().locations
         return response
 
+    def handle_set_locations(self, request):
+        self.add_locations_to_dict(request.locations)
+        self.publish_event('locations')
+        self.update_predicates()
+        return SetLocationsResponse()
+
+    def handle_clear_locations(self, request):
+        rospy.loginfo("Clearing locations")
+        self.location_dict = {}
+
+        return EmptyResponse()
+
+    def add_locations_to_dict(self, locations):
+        for location in locations:
+            marker = self.create_location_marker(location)
+            label = self.create_location_label(location)
+
+            location_tuple = LocationTuple(pose=location.pose, marker=marker, label=label)
+            self.location_dict[location.name] = location_tuple
+
+            response = AddCurrentLocationResponse()
+            response.success = True
+
+    # Objects
     def handle_get_objects(self, request):
         response = GetObjectsResponse()
         response.objects = self.create_object_array().objects
         return response
 
-    def handle_get_robots(self, request):
-        response = GetRobotsResponse()
-        robot = Robot()
-        robot.name = self.master_name
-        robot.pose = self.current_pose.pose
-        response.robots.append(robot)
-        return response
-
-    def handle_add_current_pose(self, request):
-        location_name = request.name
-
-        marker = self.create_location_marker(self.current_pose)
-        label = self.create_location_label(self.current_pose, location_name)
-
-        location = LocationTuple(
-            pose_stamped=self.current_pose, marker=marker, label=label)
-        self.location_dict[str(location_name)] = location
-
-        response = AddCurrentLocationResponse()
-        response.success = True
-
-        return response
-
-    def handle_clear_poses(self, request):
-        rospy.loginfo("Clearing poses")
-        self.location_dict = {}
-
-        return EmptyResponse()
-
-    def handle_save_state(self, request):
-        with open(self.save_state_filename, 'w') as outfile:
-            yaml.dump(self.location_dict, outfile, default_flow_style=False)
-
-        return EmptyResponse()
-
-    def handle_load_state(self, request):
-
-        try:
-            with open(self.save_state_filename, 'r') as infile:
-                try:
-                    self.location_dict = yaml.load(infile)
-                except yaml.YAMLError as exc:
-                    rospy.logerr('Failed to load state!')
-        except:
-            rospy.logwarn("No save file found!")
-
-        return EmptyResponse()
+    def handle_set_objects(self, request):
+        for object in request.objects:
+            self.add_object_to_dict(object)
+        self.publish_event('objects')
+        self.update_predicates()
+        return SetObjectsResponse()
 
     def handle_clear_objects(self, request):
         rospy.loginfo("Clearing objects")
@@ -259,21 +268,83 @@ class SimpleWorldState:
 
         return EmptyResponse()
 
+    def add_object_to_dict(self, object):
+        marker = self.create_object_marker(object)
+        label = self.create_object_label(object, object.name)
+        objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
+        self.object_dict[object.name] = objectTuple
+
     def handle_get_unity_objects(self, request):
         rospy.loginfo("Getting objects from Unity")
         rospy.wait_for_service('/unity/get_objects')
         try:
             response = rospy.ServiceProxy('/unity/get_objects', GetObjects)()
             for object in response.objects:
-                marker = self.create_object_marker(object)
-                label = self.create_object_label(object, object.name)
-                objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
-                self.object_dict[object.name] = objectTuple
+                self.add_object_to_dict(object)
         except rospy.ServiceException, e:
             rospy.logwarn('Service call failed: %s', e)
 
         return EmptyResponse()
 
+    # Robots
+    def handle_clear_robots(self, request):
+        rospy.loginfo('Clearing robots')
+        self.robot_dict = {}
+        return EmptyResponse()
+
+    def handle_set_robots(self, request):
+        for robot in request.robots:
+            self.robot_dict[robot.name] = robot
+        self.publish_event("robots")
+        self.update_predicates()
+        return SetRobotsResponse()
+
+    def handle_get_robots(self, request):
+        robots = []
+        for key, robot in self.robot_dict.items():
+            robots.append(robot)
+
+        response = GetRobotsResponse()
+        response.robots = robots
+        return response
+
+    def handle_add_current_pose(self, request):
+        location = Location(name=request.name, pose=self.current_pose.pose)
+        add_locations_to_dict([location])
+        return response
+
+    def add_robots_to_dict(self, robots):
+        marker = self.create_object_marker(object)
+        label = self.create_object_label(object, object.name)
+        objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
+        self.object_dict[object.name] = objectTuple
+
+    def handle_clear_all(self, request):
+        self.handle_clear_objects(EmptyRequest())
+        self.handle_clear_locations(EmptyRequest())
+        self.handle_clear_robots(EmptyRequest())
+        return EmptyResponse()
+
+    def handle_save_state(self, request):
+        with open(self.save_state_filename, 'w') as outfile:
+            yaml.dump(self.location_dict, outfile, default_flow_style=False)
+
+        return EmptyResponse()
+
+    def handle_load_state(self, request):
+
+        try:
+            with open(self.save_state_filename, 'r') as infile:
+                try:
+                    self.location_dict = yaml.load(infile)
+                except yaml.YAMLError as exc:
+                    rospy.logerr('Failed to load state!')
+        except:
+            rospy.logwarn("No save file found!")
+
+        return EmptyResponse()
+
+    # Predicated
     def handle_set_object_moving(self, request):
         if request.is_moving:
             if request.object_name in self.object_dict:
@@ -315,6 +386,9 @@ class SimpleWorldState:
         self.object_pub = rospy.Publisher(
             '/world_state/objects', ObjectArray, queue_size=1)
 
+        self.robot_pub = rospy.Publisher(
+            '/world_state/robots', RobotArray, queue_size=1)
+
         self.marker_pub = rospy.Publisher(
             '/world_state/markers', MarkerArray, queue_size=1)
 
@@ -330,8 +404,11 @@ class SimpleWorldState:
         self.last_pose = self.current_pose
         self.current_pose = pose_msg
 
+        robot = Robot(name=self.master_name, type=self.robot_base_type, pose=pose_msg.pose)
+        self.robot_dict[self.master_name] = robot
+
         if not self.same_position(self.current_pose, self.last_pose):
-            self.publish_event("robot_pose_update")
+            self.publish_event("robots")
             self.update_predicates()
 
     def update_predicates(self):
@@ -456,7 +533,7 @@ class SimpleWorldState:
         marker.color.b = marker_color['b']
         marker.color.a = marker_color['a']
 
-        marker.header.frame_id = location.header.frame_id
+        marker.header.frame_id = 'map'
         marker.header.stamp = rospy.Time.now()
 
         marker.pose = deepcopy(location.pose)
@@ -464,7 +541,7 @@ class SimpleWorldState:
 
         return marker
 
-    def create_location_label(self, location, text):
+    def create_location_label(self, location):
         font_size = 0.24
         marker_lifetime = 1  # 0 if forever
         marker_ns = 'location_labels'
@@ -483,14 +560,14 @@ class SimpleWorldState:
         label_marker.lifetime = rospy.Duration(marker_lifetime)
 
         label_marker.scale.z = font_size
-        label_marker.text = text
+        label_marker.text = location.name
 
         label_marker.color.r = marker_color['r']
         label_marker.color.g = marker_color['g']
         label_marker.color.b = marker_color['b']
         label_marker.color.a = marker_color['a']
 
-        label_marker.header.frame_id = location.header.frame_id
+        label_marker.header.frame_id = 'map'
         label_marker.header.stamp = rospy.Time.now()
 
         label_marker.pose = self.modify_location_label_pose(location.pose)
@@ -523,7 +600,7 @@ class SimpleWorldState:
         for key in self.location_dict:
             location_msg = Location()
             location_msg.name = key
-            location_msg.pose = self.location_dict[key].pose_stamped.pose
+            location_msg.pose = self.location_dict[key].pose
             location_array_msg.locations.append(location_msg)
         return location_array_msg
 
@@ -537,10 +614,17 @@ class SimpleWorldState:
             object_array_msg.objects.append(object_msg)
         return object_array_msg
 
+    def create_robot_array(self):
+        robot_array_msg = RobotArray()
+        for key, robot in self.robot_dict.items():
+            robot_array_msg.robots.append(robot)
+        return robot_array_msg
+
     def publish(self):
 
         self.location_pub.publish(self.create_location_array())
         self.object_pub.publish(self.create_object_array())
+        self.robot_pub.publish(self.create_robot_array())
 
         marker_array_msg = MarkerArray()
         for key in self.location_dict:
@@ -566,9 +650,9 @@ class SimpleWorldState:
 
 
 if __name__ == '__main__':
-    rospy.init_node('simple_world_state')
+    rospy.init_node('world_state')
 
-    simple_world_state = SimpleWorldState()
+    simple_world_state = LocalWorldState()
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():

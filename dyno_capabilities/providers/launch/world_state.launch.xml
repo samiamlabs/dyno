@@ -1,4 +1,4 @@
 <launch>
-  <include file="$(find dyno_world_state)/launch/simple.launch"/>
+  <include file="$(find dyno_world_state)/launch/local.launch"/>
 
 </launch>

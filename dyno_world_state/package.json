@@ -9,8 +9,14 @@
   },
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "immutable": "^3.8.2",
+    "mathjs": "^5.1.1",
+    "pouchdb": "^7.0.0",
+    "pouchdb-adapter-memory": "^7.0.0",
+    "pouchdb-erase": "^1.0.2",
     "rosnodejs": "^3.0.0"
   },
   "devDependencies": {

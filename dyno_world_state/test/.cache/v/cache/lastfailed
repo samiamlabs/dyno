@@ -1,0 +1,3 @@
+{
+  "world_state/test_predicates.py::test_it_publishes_objects_at_locations_change_event": true
+}
