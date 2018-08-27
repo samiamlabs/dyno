@@ -291,6 +291,7 @@ class LocalWorldState:
         except rospy.ServiceException, e:
             rospy.logwarn('Service call failed: %s', e)
 
+        self.publish_event('objects')
         return EmptyResponse()
 
     # Robots
@@ -304,7 +305,7 @@ class LocalWorldState:
     def handle_set_robots(self, request):
         for robot in request.robots:
             self.robot_dict[robot.name] = robot
-        self.publish_event("robots")
+        self.publish_event('robots')
         self.update_predicates()
         return SetRobotsResponse()
 

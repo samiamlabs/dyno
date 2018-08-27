@@ -14,6 +14,7 @@
     "babel-register": "^6.26.0",
     "immutable": "^3.8.2",
     "mathjs": "^5.1.1",
+    "phaser": "^3.11.0",
     "pouchdb": "^7.0.0",
     "pouchdb-adapter-memory": "^7.0.0",
     "pouchdb-erase": "^1.0.2",
