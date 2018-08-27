@@ -20,6 +20,7 @@ add_message_files(
     Object.msg
     ObjectArray.msg
     ObjectAtLocation.msg
+    ObjectOnRobot.msg
     Robot.msg
     RobotArray.msg
     RobotAtLocation.msg
@@ -31,12 +32,14 @@ add_service_files(
     srv
   FILES
     AddCurrentLocation.srv
+    AddObjectOnRobot.srv
     GetLocations.srv
     GetObjects.srv
     GetObjectsAtLocations.srv
+    GetObjectsOnRobots.srv
     GetRobots.srv
-    RemoveObjectsAtLocations.srv
     GetRobotsAtLocations.srv
+    RemoveObjectOnRobot.srv
     SetLocations.srv
     SetObjectGrabber.srv
     SetObjectMoving.srv

@@ -47,6 +47,7 @@ class LocalWorldState:
 
         self.robots_at_locations = []
         self.objects_at_locations = []
+        self.objects_on_robots = []
 
         self.unique_id_counter = 1000
 
@@ -124,8 +125,17 @@ class LocalWorldState:
         self.get_objects_at_locations = rospy.Service(
             '/world_state/get_objects_at_locations', GetObjectsAtLocations, self.handle_get_objects_at_locations)
 
-        self.set_object_moving_service = rospy.Service(
-            '/world_state/set_object_moving', SetObjectMoving, self.handle_set_object_moving)
+        self.clear_objects_on_robots_service = rospy.Service(
+            '/world_state/clear_objects_on_robots', Empty, self.handle_clear_objects_on_robots)
+
+        self.add_object_on_robot = rospy.Service(
+            '/world_state/add_object_on_robot', AddObjectOnRobot, self.handle_add_object_on_robot)
+
+        self.remove_object_on_robot = rospy.Service(
+            '/world_state/remove_object_on_robot', RemoveObjectOnRobot, self.handle_remove_object_on_robot)
+
+        self.get_objects_on_robots = rospy.Service(
+            '/world_state/get_objects_on_robots', GetObjectsOnRobots, self.handle_get_objects_on_robots)
 
     def handle_get_robots_at_locations(self, request):
         self.update_robots_at_locations()
@@ -149,8 +159,10 @@ class LocalWorldState:
             robot_point_2d = np.array([robot_position.x, robot_position.y])
             for key, location_tuple in self.location_dict.items():
                 location_position = location_tuple.pose.position
-                location_point_2d = np.array([location_position.x, location_position.y])
-                distance_to_location = np.linalg.norm(robot_point_2d - location_point_2d)
+                location_point_2d = np.array(
+                    [location_position.x, location_position.y])
+                distance_to_location = np.linalg.norm(
+                    robot_point_2d - location_point_2d)
                 if distance_to_location < in_location_cutoff_distance:
                     robot_in_location = RobotAtLocation()
                     robot_in_location.robot_name = robot.name
@@ -177,13 +189,17 @@ class LocalWorldState:
         response = GetObjectsAtLocationsResponse()
         for location_name, location_tuple in self.location_dict.items():
             location_position = location_tuple.pose.position
-            location_point_2d = np.array([location_position.x, location_position.y])
+            location_point_2d = np.array(
+                [location_position.x, location_position.y])
             for object_name, object_tuple in self.object_dict.items():
                 object_position = object_tuple.pose.position
-                object_point_2d = np.array([object_position.x, object_position.y])
-                distance_to_object = np.linalg.norm(location_point_2d - object_point_2d)
+                object_point_2d = np.array(
+                    [object_position.x, object_position.y])
+                distance_to_object = np.linalg.norm(
+                    location_point_2d - object_point_2d)
                 if distance_to_object < in_location_cutoff_distance:
-                    object_at_location = ObjectAtLocation(object_name=object_name, location_name=location_name)
+                    object_at_location = ObjectAtLocation(
+                        object_name=object_name, location_name=location_name)
                     response.objects_at_locations.append(object_at_location)
 
         changed = False
@@ -215,6 +231,7 @@ class LocalWorldState:
     def handle_clear_locations(self, request):
         rospy.loginfo("Clearing locations")
         self.location_dict = {}
+        self.update_predicates()
 
         return EmptyResponse()
 
@@ -223,7 +240,8 @@ class LocalWorldState:
             marker = self.create_location_marker(location)
             label = self.create_location_label(location)
 
-            location_tuple = LocationTuple(pose=location.pose, marker=marker, label=label)
+            location_tuple = LocationTuple(
+                pose=location.pose, marker=marker, label=label)
             self.location_dict[location.name] = location_tuple
 
             response = AddCurrentLocationResponse()
@@ -245,6 +263,7 @@ class LocalWorldState:
     def handle_clear_objects(self, request):
         rospy.loginfo("Clearing objects")
         self.object_dict = {}
+        self.update_predicates()
 
         return EmptyResponse()
 
@@ -271,7 +290,8 @@ class LocalWorldState:
     def add_object_to_dict(self, object):
         marker = self.create_object_marker(object)
         label = self.create_object_label(object, object.name)
-        objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
+        objectTuple = ObjectTuple(
+            pose=object.pose, type=object.type, marker=marker, label=label)
         self.object_dict[object.name] = objectTuple
 
     def handle_get_unity_objects(self, request):
@@ -290,6 +310,8 @@ class LocalWorldState:
     def handle_clear_robots(self, request):
         rospy.loginfo('Clearing robots')
         self.robot_dict = {}
+        self.update_predicates()
+
         return EmptyResponse()
 
     def handle_set_robots(self, request):
@@ -316,7 +338,8 @@ class LocalWorldState:
     def add_robots_to_dict(self, robots):
         marker = self.create_object_marker(object)
         label = self.create_object_label(object, object.name)
-        objectTuple = ObjectTuple(pose=object.pose, type=object.type, marker=marker, label=label)
+        objectTuple = ObjectTuple(
+            pose=object.pose, type=object.type, marker=marker, label=label)
         self.object_dict[object.name] = objectTuple
 
     def handle_clear_all(self, request):
@@ -344,36 +367,67 @@ class LocalWorldState:
 
         return EmptyResponse()
 
-    # Predicated
-    def handle_set_object_moving(self, request):
-        if request.is_moving:
-            if request.object_name in self.object_dict:
-                rospy.loginfo("Adding object: %s to moving", request.object_name)
-                self.moving_object_name = request.object_name
-            else:
-                rospy.logwarn("Failed adding to moving, object: %s is not known", request.object_name)
-        else:
-            if request.object_name == self.moving_object_name:
-                rospy.loginfo("Removing object %s from moving and setting new map pose", request.object_name)
-                self.moving_object_name = None
-                # FIXME: refactor, handle z?
-                object_pose = self.object_dict[request.object_name].pose
-                object_pose.position.x = self.current_pose.pose.position.x
-                object_pose.position.y = self.current_pose.pose.position.y
-                object_marker = self.object_dict[request.object_name].marker
-                object_marker.pose.position.x = object_pose.position.x
-                object_marker.pose.position.y = object_pose.position.y
-                object_marker.pose.orientation = self.current_pose.pose.orientation
-                object_label = self.object_dict[request.object_name].label
-                object_label.pose.position.x = object_pose.position.x
-                object_label.pose.position.y = object_pose.position.y
-                object_label.pose.orientation = self.current_pose.pose.orientation
+    # Predicates
+    def handle_clear_objects_on_robots(self, request):
+        self.objects_on_robots = []
+        return EmptyResponse()
 
-            else:
-                rospy.logwarn("Failed at removing from moving, object: %s is not moving", request.object_name)
+    def handle_add_object_on_robot(self, request):
+        success = False
 
-        self.update_predicates()
-        return SetObjectMovingResponse(True)
+        for object_on_robot in self.objects_on_robots:
+            if object_on_robot.object_name == request.object_on_robot.object_name and object_on_robot.robot_name == request.object_on_robot.robot_name:
+                return AddObjectOnRobotResponse(success=success)
+
+        if request.object_on_robot.object_name in self.object_dict:
+            if request.object_on_robot.robot_name in self.robot_dict:
+                self.objects_on_robots.append(request.object_on_robot)
+                success = True
+
+        return AddObjectOnRobotResponse(success=success)
+
+    def handle_remove_object_on_robot(self, request):
+
+        for index, object_on_robot in enumerate(self.objects_on_robots):
+            if object_on_robot.object_name == request.object_on_robot.object_name and object_on_robot.robot_name == request.object_on_robot.robot_name:
+                self.objects_on_robots.pop(index)
+                return RemoveObjectOnRobotResponse(success=True)
+
+        return RemoveObjectOnRobotResponse(success=False)
+
+    def handle_get_objects_on_robots(self, request):
+        return GetObjectsOnRobotsResponse(objects_on_robots=self.objects_on_robots)
+
+
+    # def handle_set_object_moving(self, request):
+    #     if request.is_moving:
+    #         if request.object_name in self.object_dict:
+    #             rospy.loginfo("Adding object: %s to moving", request.object_name)
+    #             self.moving_object_name = request.object_name
+    #         else:
+    #             rospy.logwarn("Failed adding to moving, object: %s is not known", request.object_name)
+    #     else:
+    #         if request.object_name == self.moving_object_name:
+    #             rospy.loginfo("Removing object %s from moving and setting new map pose", request.object_name)
+    #             self.moving_object_name = None
+    #             # FIXME: refactor, handle z?
+    #             object_pose = self.object_dict[request.object_name].pose
+    #             object_pose.position.x = self.current_pose.pose.position.x
+    #             object_pose.position.y = self.current_pose.pose.position.y
+    #             object_marker = self.object_dict[request.object_name].marker
+    #             object_marker.pose.position.x = object_pose.position.x
+    #             object_marker.pose.position.y = object_pose.position.y
+    #             object_marker.pose.orientation = self.current_pose.pose.orientation
+    #             object_label = self.object_dict[request.object_name].label
+    #             object_label.pose.position.x = object_pose.position.x
+    #             object_label.pose.position.y = object_pose.position.y
+    #             object_label.pose.orientation = self.current_pose.pose.orientation
+    #
+    #         else:
+    #             rospy.logwarn("Failed at removing from moving, object: %s is not moving", request.object_name)
+    #
+    #     self.update_predicates()
+    #     return SetObjectMovingResponse(True)
 
     def init_subscribers(self):
         rospy.Subscriber("/robot_pose", PoseStamped,
@@ -404,7 +458,8 @@ class LocalWorldState:
         self.last_pose = self.current_pose
         self.current_pose = pose_msg
 
-        robot = Robot(name=self.master_name, type=self.robot_base_type, pose=pose_msg.pose)
+        robot = Robot(name=self.master_name,
+                      type=self.robot_base_type, pose=pose_msg.pose)
         self.robot_dict[self.master_name] = robot
 
         if not self.same_position(self.current_pose, self.last_pose):

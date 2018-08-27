@@ -1,0 +1,3 @@
+dyno_msgs/ObjectOnRobot object_on_robot
+---
+bool success

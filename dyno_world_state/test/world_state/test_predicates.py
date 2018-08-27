@@ -19,6 +19,7 @@ def node():
     clear_robots()
     clear_locations()
     clear_objects()
+    clear_objects_on_robots()
 
 
 @pytest.fixture
@@ -121,6 +122,49 @@ def get_objects_at_locations():
     except rospy.ServiceException, e:
         print "Service call failed: %s" % e
         return []
+
+
+def clear_objects_on_robots():
+    service_name = '/world_state/clear_objects_on_robots'
+    rospy.wait_for_service(service_name)
+    try:
+        rospy.ServiceProxy(service_name, Empty)()
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
+
+
+def get_objects_on_robots():
+    service_name = '/world_state/get_objects_on_robots'
+    rospy.wait_for_service(service_name)
+    try:
+        return rospy.ServiceProxy(service_name, GetObjectsOnRobots)().objects_on_robots
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
+        return []
+
+
+def add_object_on_robot(object_name, robot_name):
+    object_on_robot = ObjectOnRobot(robot_name=robot_name, object_name=object_name)
+    request = AddObjectOnRobotRequest(object_on_robot=object_on_robot)
+    service_name = '/world_state/add_object_on_robot'
+    rospy.wait_for_service(service_name)
+    try:
+        return rospy.ServiceProxy(service_name, AddObjectOnRobot)(request).success
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
+    return SetObjectOnRobotResponse()
+
+
+def remove_object_on_robot(object_name, robot_name):
+    object_on_robot = ObjectOnRobot(robot_name=robot_name, object_name=object_name)
+    request = RemoveObjectOnRobotRequest(object_on_robot=object_on_robot)
+    service_name = '/world_state/remove_object_on_robot'
+    rospy.wait_for_service(service_name)
+    try:
+        return rospy.ServiceProxy(service_name, RemoveObjectOnRobot)(request).success
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
+    return RemoveObjectOnRobotResponse()
 
 
 def test_it_calculates_robot_at_location(node):
@@ -236,7 +280,7 @@ def test_it_calculates_object_at_location(node):
 
 def test_it_calculates_no_objects_at_locations(node):
     pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
-    object = Robot(name='blue_box', type='parcel', pose=pose)
+    object = Object(name='blue_box', type='parcel', pose=pose)
     set_objects([object])
 
     position = Point(x=0.8, y=0.2, z=0.3)
@@ -279,13 +323,13 @@ def test_it_publishes_objects_at_locations_change_event(node, waiter):
 
     objects = []
     pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
-    objects.append(Robot(name='blue', type='quadrotor', pose=pose))
+    objects.append(Object(name='blue_box', type='parcel', pose=pose))
     set_objects(objects)
 
     locations = []
     position = Point(x=0.1, y=0.2, z=0.3)
     orientation = Quaternion(x=0, y=0, z=0, w=1.0)
-    locations.append(Location(name='start', pose=Pose(position=position, orientation=orientation)))
+    locations.append(Location(name='middle', pose=Pose(position=position, orientation=orientation)))
     set_locations(locations)
 
     waiter.wait(1.0)
@@ -294,17 +338,150 @@ def test_it_publishes_objects_at_locations_change_event(node, waiter):
 
     waiter.received = []
 
-    robots = []
-    pose = Pose(position=Point(x=0.8, y=0.2, z=0.3))
-    robots.append(Robot(name='red', type='quadrotor', pose=pose))
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
     set_objects(objects)
 
     locations = []
-    second_position = Point(x=0.8, y=0.2, z=0.3)
-    second_orientation = Quaternion(x=0, y=0, z=0, w=1.0)
-    locations.append(Location(name='above', pose=Pose(position=second_position, orientation=second_orientation)))
+    second_position = Point(x=-0.8, y=0.2, z=0.3)
+    locations.append(Location(name='below', pose=Pose(position=second_position)))
     set_locations(locations)
 
     waiter.wait(1.0)
 
     assert waiter.success
+
+
+def test_it_adds_object_on_robot(node):
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robot = Robot(name='blue', type='quadrotor', pose=pose)
+    set_robots([robot])
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    success = add_object_on_robot('red_box', 'blue')
+    objects_on_robots = get_objects_on_robots()
+
+    assert success
+    assert len(objects_on_robots) == 1
+    assert objects_on_robots[0].object_name == 'red_box'
+    assert objects_on_robots[0].robot_name == 'blue'
+
+
+def test_it_clears_objects_on_robots(node):
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robot = Robot(name='blue', type='quadrotor', pose=pose)
+    set_robots([robot])
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    success = add_object_on_robot('red_box', 'blue')
+
+    objects_on_robots = get_objects_on_robots()
+    assert len(objects_on_robots) == 1
+
+    clear_objects_on_robots()
+
+    objects_on_robots = get_objects_on_robots()
+    assert len(objects_on_robots) == 0
+
+
+def test_it_adds_objects_on_robots(node):
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robot = Robot(name='blue', type='quadrotor', pose=pose)
+    second_robot = Robot(name='red', type='quadrotor', pose=pose)
+    set_robots([robot, second_robot])
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    objects.append(Object(name='green_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    success = add_object_on_robot('red_box', 'blue')
+    success = add_object_on_robot('green_box', 'red')
+    objects_on_robots = get_objects_on_robots()
+
+    assert len(objects_on_robots) == 2
+
+
+def test_it_overwrites_objects_on_robots(node):
+    robots = []
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robots.append(Robot(name='blue', type='quadrotor', pose=pose))
+    set_robots(robots)
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    success = add_object_on_robot('red_box', 'blue')
+    success = add_object_on_robot('red_box', 'blue')
+    objects_on_robots = get_objects_on_robots()
+
+    assert len(objects_on_robots) == 1
+    assert objects_on_robots[0].object_name == 'red_box'
+    assert objects_on_robots[0].robot_name == 'blue'
+
+
+def test_it_removes_object_on_robot(node):
+    robots = []
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robots.append(Robot(name='blue', type='quadrotor', pose=pose))
+    robots.append(Robot(name='red', type='quadrotor', pose=pose))
+    set_robots(robots)
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    objects.append(Object(name='green_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    add_object_on_robot('red_box', 'blue')
+    add_object_on_robot('green_box', 'red')
+
+    success = remove_object_on_robot('red_box', 'blue')
+
+    objects_on_robots = get_objects_on_robots()
+
+    assert success
+    assert len(objects_on_robots) == 1
+
+
+def test_it_fails_to_add_non_exsisting_object_on_robot(node):
+
+    success = add_object_on_robot('red_box', 'blue')
+
+    assert not success
+
+
+def test_it_fails_to_remove_non_exsisting_object_on_robot(node):
+    robots = []
+    pose = Pose(position=Point(x=0.1, y=0.2, z=0.3))
+    robots.append(Robot(name='blue', type='quadrotor', pose=pose))
+    robots.append(Robot(name='red', type='quadrotor', pose=pose))
+    set_robots(robots)
+
+    objects = []
+    pose = Pose(position=Point(x=-0.8, y=0.2, z=0.3))
+    objects.append(Object(name='red_box', type='parcel', pose=pose))
+    objects.append(Object(name='green_box', type='parcel', pose=pose))
+    set_objects(objects)
+
+    add_object_on_robot('red_box', 'blue')
+    add_object_on_robot('green_box', 'red')
+
+    success = remove_object_on_robot('blue_box', 'blue')
+
+    objects_on_robots = get_objects_on_robots()
+
+    assert not success
+    assert len(objects_on_robots) == 2
