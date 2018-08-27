@@ -1,6 +1,8 @@
 <launch>
   <node pkg="dyno_world_state" name="world_state" type="local" output="screen"/>
 
+  <node name="world_state_visualizer" pkg="dyno_world_state" type="visualizer" output="screen"/>
+
   <node pkg="robot_pose_publisher" name="robot_pose_publisher" type="robot_pose_publisher">
     <param name="is_stamped" value="true"/>
     <param name="base_frame" value="base_footprint"/>

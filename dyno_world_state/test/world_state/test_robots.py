@@ -203,7 +203,7 @@ def test_it_publishes_the_correct_robot_props(node, waiter):
     robots.append(Robot(name='blue_box', type='parcel'))
     set_robots(robots)
 
-    waiter.condition = lambda data: data.robots[0].name == 'blue_box' and data.robots[0].type == 'parcel'
+    waiter.condition = lambda data: len(data.robots) > 0 and data.robots[0].name == 'blue_box' and data.robots[0].type == 'parcel'
     rospy.Subscriber('/world_state/robots', RobotArray, waiter.callback)
     waiter.wait(5.0)
 

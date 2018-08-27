@@ -175,7 +175,8 @@ def test_it_publishes_the_correct_location_name(node, waiter):
     locations.append(Location(name='start'))
     set_locations(locations)
 
-    waiter.condition = lambda data: data.locations[0].name == 'start'
+    rospy.sleep(0.1)
+    waiter.condition = lambda data: len(data.locations) > 0 and data.locations[0].name == 'start'
     rospy.Subscriber('/world_state/locations', LocationArray, waiter.callback)
     waiter.wait(5.0)
 

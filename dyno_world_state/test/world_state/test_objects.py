@@ -176,7 +176,7 @@ def test_it_publishes_the_correct_object_props(node, waiter):
     objects.append(Object(name='blue_box', type='parcel'))
     set_objects(objects)
 
-    waiter.condition = lambda data: data.objects[0].name == 'blue_box' and data.objects[0].type == 'parcel'
+    waiter.condition = lambda data: len(data.objects) > 0 and data.objects[0].name == 'blue_box' and data.objects[0].type == 'parcel'
     rospy.Subscriber('/world_state/objects', LocationArray, waiter.callback)
     waiter.wait(5.0)
 

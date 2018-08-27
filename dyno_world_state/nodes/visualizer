@@ -14,25 +14,163 @@ from dyno_msgs.msg import *
 from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import PoseWithCovarianceStamped, PoseStamped, Quaternion, Pose, Point
 
-from collections import namedtuple
-
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
 import tf_conversions.posemath as pm
 import numpy as np
 
-import rospkg
-import yaml
-
 from copy import deepcopy
-
-# LocationTuple = namedtuple("LocationTuple", "pose, marker, label")
-# ObjectTuple = namedtuple("ObjectTuple", "pose, type, marker, label")
 
 
 class WorldStateVisualizer:
     def __init__(self):
-        pass
+        self.namespace = '/'
+        self.unique_id_counter = 0
+
+        self.object_label_z_offset = 0.25
+
+        self.objects_dict = {}
+        self.locations_dict = {}
+        self.robots_dict = {}
+
+        self.init_publishers()
+        self.init_subscribers()
+
+    def init_subscribers(self):
+        topic_name = self.namespace + 'world_state/event'
+        rospy.Subscriber(topic_name, WorldStateEvent, self.world_state_event_callback)
+
+    def init_publishers(self):
+        topic_name = self.namespace + 'world_state/markers'
+        self.marker_pub = rospy.Publisher(topic_name, MarkerArray, queue_size=1)
+
+    def world_state_event_callback(self, event_msg):
+        if event_msg.type == 'objects':
+            self.update_objects()
+        elif event_msg.type == 'locations':
+            self.update_locations()
+        elif event_msg.type == 'robots':
+            self.update_robots()
+
+    def update_objects(self):
+        objects = self.get_objects()
+
+        for key, object_dict in self.objects_dict.items():
+            object_dict['should_keep'] = False
+
+        for object in objects:
+            if object.name not in self.objects_dict:
+                object_dict = {}
+                object_dict['object'] = object
+                object_dict['marker'] = self.create_object_marker(object)
+                object_dict['label'] = self.create_object_label(object)
+                object_dict['should_keep'] = True
+                self.objects_dict[object.name] = object_dict
+            else:
+                object_dict = self.objects_dict[object.name]
+                object_dict['object'] = object
+                self.update_object_marker(object_dict['marker'], object)
+                self.update_object_label(object_dict['label'], object)
+                object_dict['should_keep'] = True
+
+        for key, object_dict in self.objects_dict.items():
+            if not object_dict['should_keep']:
+                del self.objects_dict[key]
+
+    def get_objects(self):
+        service_name = self.namespace + 'world_state/get_objects'
+        rospy.wait_for_service(service_name)
+        try:
+            return rospy.ServiceProxy(service_name, GetObjects)().objects
+        except rospy.ServiceException, e:
+            print "Service call failed: %s" % e
+            return []
+
+    def update_object_marker(self, marker, object):
+        marker.pose = deepcopy(object.pose)
+
+    def update_object_label(self, label, object):
+        label.pose = self.modify_object_label_pose(object.pose)
+
+    def update_locations(self):
+        locations = self.get_locations()
+
+        for key, location_dict in self.locations_dict.items():
+            location_dict['should_keep'] = False
+
+        for location in locations:
+            if location.name not in self.locations_dict:
+                location_dict = {}
+                location_dict['location'] = location
+                location_dict['marker'] = self.create_location_marker(location)
+                location_dict['label'] = self.create_location_label(location)
+                location_dict['should_keep'] = True
+                self.locations_dict[location.name] = location_dict
+            else:
+                location_dict = self.locations_dict[location.name]
+                location_dict['location'] = location
+                self.update_location_marker(location_dict['marker'], location)
+                self.update_location_label(location_dict['label'], location)
+                location_dict['should_keep'] = True
+
+        for key, location_dict in self.locations_dict.items():
+            if not location_dict['should_keep']:
+                del self.locations_dict[key]
+
+    def get_locations(self):
+        service_name = self.namespace + 'world_state/get_locations'
+        rospy.wait_for_service(service_name)
+        try:
+            return rospy.ServiceProxy(service_name, GetLocations)().locations
+        except rospy.ServiceException, e:
+            print "Service call failed: %s" % e
+            return []
+
+    def update_location_marker(self, marker, location):
+        marker.pose = deepcopy(location.pose)
+
+    def update_location_label(self, label, location):
+        label.pose = self.modify_location_label_pose(location.pose)
+
+    def update_robots(self):
+        robots = self.get_robots()
+
+        for key, robot_dict in self.robots_dict.items():
+            robot_dict['should_keep'] = False
+
+        for robot in robots:
+            if robot.name not in self.robots_dict:
+                robot_dict = {}
+                robot_dict['robot'] = robot
+                robot_dict['marker'] = self.create_robot_marker(robot)
+                robot_dict['label'] = self.create_robot_label(robot)
+                robot_dict['should_keep'] = True
+                self.robots_dict[robot.name] = robot_dict
+            else:
+                robot_dict = self.robots_dict[robot.name]
+                robot_dict['robot'] = robot
+                self.update_robot_marker(robot_dict['marker'], robot)
+                self.update_robot_label(robot_dict['label'], robot)
+                robot_dict['should_keep'] = True
+
+        for key, robot_dict in self.robots_dict.items():
+            if not robot_dict['should_keep']:
+                del self.robots_dict[key]
+
+    def get_robots(self):
+        service_name = self.namespace + 'world_state/get_robots'
+        rospy.wait_for_service(service_name)
+        try:
+            return rospy.ServiceProxy(service_name, GetRobots)().robots
+        except rospy.ServiceException, e:
+            print "Service call failed: %s" % e
+            return []
+
+    def update_robot_marker(self, marker, robot):
+        marker.pose = deepcopy(robot.pose)
+
+    def update_robot_label(self, label, robot):
+        label.pose = deepcopy(robot.pose)
 
     def create_object_marker(self, object):
         marker_scale = .3
@@ -68,7 +206,7 @@ class WorldStateVisualizer:
 
         return marker
 
-    def create_object_label(self, object, text):
+    def create_object_label(self, object):
         font_size = 0.24
         marker_lifetime = 1  # 0 if forever
         marker_ns = 'object_labels'
@@ -87,7 +225,7 @@ class WorldStateVisualizer:
         label_marker.lifetime = rospy.Duration(marker_lifetime)
 
         label_marker.scale.z = font_size
-        label_marker.text = text
+        label_marker.text = object.name
 
         label_marker.color.r = marker_color['r']
         label_marker.color.g = marker_color['g']
@@ -110,7 +248,7 @@ class WorldStateVisualizer:
 
         modified_x = temp_pose.position.x
         modified_y = temp_pose.position.y
-        modified_z = temp_pose.position.z + 0.25
+        modified_z = temp_pose.position.z + self.object_label_z_offset
 
         q_angle = quaternion_from_euler(0, 0, alpha, axes='sxyz')
         q = Quaternion(*q_angle)
@@ -205,59 +343,89 @@ class WorldStateVisualizer:
 
         return temp_pose
 
+    def create_robot_marker(self, robot):
+        marker_scale = .3
+        marker_lifetime = 1  # 0 if forever
+        marker_ns = 'robots'
+        marker_color = {'r': 0.7, 'g': 0.4, 'b': 0.4, 'a': 0.9}
+
+        marker = Marker()
+
+        marker.ns = marker_ns
+        marker.type = Marker.SPHERE
+
+        # Generate unique id
+        marker.id = self.unique_id_counter
+        self.unique_id_counter += 1
+
+        marker.action = Marker.ADD
+        marker.lifetime = rospy.Duration(marker_lifetime)
+
+        marker.scale.x = marker_scale
+        marker.scale.y = marker_scale
+        marker.scale.z = marker_scale
+
+        marker.color.r = marker_color['r']
+        marker.color.g = marker_color['g']
+        marker.color.b = marker_color['b']
+        marker.color.a = marker_color['a']
+
+        marker.header.frame_id = 'map'
+        marker.header.stamp = rospy.Time.now()
+
+        marker.pose = robot.pose
+
+        return marker
+
+    def create_robot_label(self, robot):
+        font_size = 0.24
+        marker_lifetime = 1  # 0 if forever
+        marker_ns = 'robot_labels'
+        marker_color = {'r': 0.2, 'g': 0.2, 'b': 0.5, 'a': 1.0}
+
+        label_marker = Marker()
+
+        label_marker.ns = marker_ns
+
+        # Generate unique id
+        label_marker.id = self.unique_id_counter
+        self.unique_id_counter += 1
+
+        label_marker.type = Marker.TEXT_VIEW_FACING
+        label_marker.action = Marker.ADD
+        label_marker.lifetime = rospy.Duration(marker_lifetime)
+
+        label_marker.scale.z = font_size
+        label_marker.text = robot.name
+
+        label_marker.color.r = marker_color['r']
+        label_marker.color.g = marker_color['g']
+        label_marker.color.b = marker_color['b']
+        label_marker.color.a = marker_color['a']
+
+        label_marker.header.frame_id = 'map'
+        label_marker.header.stamp = rospy.Time.now()
+
+        label_marker.pose = deepcopy(robot.pose)
+
+        return label_marker
+
     def update(self):
         pass
 
-    def create_location_array(self):
-        location_array_msg = LocationArray()
-        for key in self.location_dict:
-            location_msg = Location()
-            location_msg.name = key
-            location_msg.pose = self.location_dict[key].pose
-            location_array_msg.locations.append(location_msg)
-        return location_array_msg
-
-    def create_object_array(self):
-        object_array_msg = ObjectArray()
-        for key, object in self.object_dict.items():
-            object_msg = Object()
-            object_msg.name = key
-            object_msg.type = object.type
-            object_msg.pose = object.pose
-            object_array_msg.objects.append(object_msg)
-        return object_array_msg
-
-    def create_robot_array(self):
-        robot_array_msg = RobotArray()
-        for key, robot in self.robot_dict.items():
-            robot_array_msg.robots.append(robot)
-        return robot_array_msg
-
     def publish(self):
-
-        self.location_pub.publish(self.create_location_array())
-        self.object_pub.publish(self.create_object_array())
-        self.robot_pub.publish(self.create_robot_array())
-
         marker_array_msg = MarkerArray()
-        for key in self.location_dict:
-            marker_array_msg.markers.append(self.location_dict[key].marker)
-            marker_array_msg.markers.append(self.location_dict[key].label)
+        for key, object_dict in self.objects_dict.items():
+            marker_array_msg.markers.append(object_dict['marker'])
+            marker_array_msg.markers.append(object_dict['label'])
 
-        for key in self.object_dict:
-            if key != self.moving_object_name:
-                marker_array_msg.markers.append(self.object_dict[key].marker)
-                marker_array_msg.markers.append(self.object_dict[key].label)
-            else:
-                moving_marker = deepcopy(self.object_dict[key].marker)
-                moving_marker.pose = deepcopy(self.current_pose.pose)
-                moving_marker.pose.position.z -= 0.3
-                marker_array_msg.markers.append(moving_marker)
+        for key, location_dict in self.locations_dict.items():
+            marker_array_msg.markers.append(location_dict['marker'])
+            marker_array_msg.markers.append(location_dict['label'])
 
-                moving_marker_label = deepcopy(self.object_dict[key].label)
-                moving_marker_label.pose = deepcopy(self.current_pose.pose)
-                moving_marker_label.pose.position.z += 0.3
-                marker_array_msg.markers.append(moving_marker_label)
+        for key, robot_dict in self.robots_dict.items():
+            marker_array_msg.markers.append(robot_dict['marker'])
+            marker_array_msg.markers.append(robot_dict['label'])
 
         self.marker_pub.publish(marker_array_msg)
 

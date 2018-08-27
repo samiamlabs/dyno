@@ -1,6 +1,6 @@
 <launch>
 
-  <node name="world_state" pkg="dyno_world_state" type="pouch_db" output="screen"/>
+  <include file="$(find dyno_world_state)/launch/distributed.launch"/>
 
   <param name="test_module" value="world_state"/>
   <test test-name="test_world_state" pkg="dyno_world_state" type="pytest_runner.py"/>
