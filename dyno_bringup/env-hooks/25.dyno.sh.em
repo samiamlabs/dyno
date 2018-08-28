@@ -17,6 +17,7 @@
 : ${DYNO_NAME:=Dyno}
 : ${DYNO_SIMULATION:=true}
 : ${DYNO_BASE:=turtlebot3}
+: ${DYNO_BASE_VARIANT:=default}
 : ${DYNO_RAPP_PACKAGE_WHITELIST:=[rocon_apps, dyno_rapps]}
 : ${DYNO_RAPP_PACKAGE_BLACKLIST:=[]}
 : ${DYNO_HUB_URI:=http://localhost:6380}
@@ -34,6 +35,7 @@
 export DYNO_NAME
 export DYNO_SIMULATION
 export DYNO_BASE
+export DYNO_BASE_VARIANT
 export DYNO_RAPP_PACKAGE_WHITELIST
 export DYNO_RAPP_PACKAGE_BLACKLIST
 export DYNO_HUB_URI

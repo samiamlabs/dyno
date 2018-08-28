@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- <xacro:include filename="rplidar_a2.gazebo.xacro"/> -->
+
+  <xacro:macro name="rplidar_a2" params="name x_offset y_offset z_offset yaw_offset parent">
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+      <origin xyz="${x_offset} ${y_offset} ${z_offset}" rpy="0 0 ${yaw_offset}"/>
+    </joint>
+
+    <link name="${name}_link">
+      <visual>
+        <origin xyz="0 0 0.0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://dyno_description/meshes/sensors/rplidar_a2.dae" scale="0.01 0.01 0.01"/>
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="0.0315" radius="0.055"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <mass value="0.114" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                 iyy="0.001" iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+    </link>
+
+    <!-- <rplidar_a2_gazebo name="${name}"/> -->
+  </xacro:macro>
+
+</robot>

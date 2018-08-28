@@ -2,6 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno_turtlebot" >
   <xacro:arg name="use_ros_control_for_base" default="true"/>
+  <xacro:arg name="base_variant" default="default"/>
 
   <xacro:include filename="../urdf/materials/materials.xacro"/>
   <xacro:include filename="../urdf/utils.urdf.xacro"/>

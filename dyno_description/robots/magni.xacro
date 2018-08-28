@@ -2,23 +2,46 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="dyno_magni" >
   <xacro:arg name="use_ros_control_for_base" default="true"/>
+  <xacro:arg name="base_variant" default="default"/>
+  <xacro:property name="base_variant" value="$(arg base_variant)"/>
 
   <xacro:include filename="../urdf/materials/materials.xacro"/>
   <xacro:include filename="../urdf/utils.urdf.xacro"/>
   <xacro:include filename="../urdf/plugins.gazebo.xacro"/>
 
   <!-- Set up definitions of parts of robot body -->
-  <xacro:include filename="../urdf/base/magni_base.urdf.xacro"/>
-  <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
-  <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
 
-  <!-- Use macros to define the actual robot -->
-  <base/>
+  <xacro:if value="${base_variant == 'default'}">
+    <xacro:include filename="../urdf/base/magni_base.urdf.xacro"/>
+    <xacro:include filename="../urdf/sensors/lds_lfcd.urdf.xacro"/>
+    <xacro:include filename="../urdf/sensors/imu.urdf.xacro"/>
 
-  <!-- Laser Scanner -->
-  <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.2" yaw_offset="0" parent="base_link"/>
+    <!-- Use macros to define the actual robot -->
+    <base/>
 
-  <!-- Imu -->
-  <imu x_offset="0" y_offset="0" z_offset="0"/>
+    <!-- Laser Scanner -->
+    <lds_lfcd name="base_scan" x_offset="0" y_offset="0" z_offset="0.2" yaw_offset="0" parent="base_link"/>
+
+    <!-- Imu -->
+    <imu x_offset="0" y_offset="0" z_offset="0"/>
+  </xacro:if>
+
+  <xacro:if value="${base_variant == 'sign'}">
+    <xacro:include filename="../urdf/base/magni_sign_base.urdf.xacro"/>
+    <xacro:include filename="../urdf/sensors/sick_tim.urdf.xacro"/>
+    <xacro:include filename="../urdf/sensors/rplidar_a2.urdf.xacro"/>
+    <!-- Use macros to define the actual robot -->
+    <base/>
+
+    <joint name="base_scan_mount_joint" type="fixed">
+      <origin xyz="0.0725 0 1.85" rpy="0 0 0"/>
+      <child link="base_scan_mount_link"/>
+      <parent link="sign_pole_link"/>
+    </joint>
+
+    <sick_tim571 name="base_scan" ros_topic="scan"/>
+
+    <rplidar_a2 name="obstacle_scan" x_offset="0.06" y_offset="0" z_offset="0.11" yaw_offset="0" parent="base_link"/>
+  </xacro:if>
 
 </robot>
