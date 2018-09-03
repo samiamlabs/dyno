@@ -1,0 +1,23 @@
+<launch>
+  <arg name="base" default="$(env DYNO_BASE)"/>
+
+  <group if="$(eval base == 'forklift')">
+    <arg name="map_file" default="$(find dyno_localization)/maps/warehouse.yaml"/>
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  </group>
+
+  <group if="$(eval base == 'quadrotor')">
+    <arg name="map_file" default="$(find dyno_localization)/maps/quadrotor.yaml"/>
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  </group>
+
+  <group if="$(eval base == 'magni')">
+    <arg name="map_file" default="$(find dyno_localization)/maps/arlanda_floor_2.yaml"/>
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+  </group>
+
+  <node name="vive_tracker_to_tf" pkg="dyno_localization" type="vive_tracker_to_tf" />
+</launch>

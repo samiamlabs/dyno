@@ -1,18 +1,12 @@
 <launch>
-  <arg name="base" default="$(env DYNO_BASE)"/>
+  <!-- Localization -->
+  <include file="$(find dyno_localization)/launch/vive_tracker.launch"/>
 
-  <group if="$(eval base == 'forklift')">
-    <arg name="map_file" default="$(find dyno_localization)/maps/warehouse.yaml"/>
-    <!-- Run the map server -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-  </group>
+  <!-- Robot pose publisher -->
 
-  <group if="$(eval base == 'quadrotor')">
-    <arg name="map_file" default="$(find dyno_localization)/maps/quadrotor.yaml"/>
-    <!-- Run the map server -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-  </group>
-
-  <node name="vive_tracker_to_tf" pkg="dyno_localization" type="vive_tracker_to_tf" />
+  <node pkg="robot_pose_publisher" name="robot_pose_publisher" type="robot_pose_publisher">
+    <param name="is_stamped" value="true"/>
+    <param name="base_frame" value="base_footprint"/>
+  </node>
 
 </launch>

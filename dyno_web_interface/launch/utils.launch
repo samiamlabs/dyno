@@ -1,0 +1,4 @@
+<launch>
+  <node name="get_map_server" pkg="dyno_web_interface" type="get_map_server"/>
+  <!-- <include file="$(find dyno_web_interface)/launch/restapi.launch"/> -->
+</launch>

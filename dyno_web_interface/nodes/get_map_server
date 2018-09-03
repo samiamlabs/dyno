@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+
+import tf
+import tf_conversions.posemath as pm
+
+from nav_msgs.msg import OccupancyGrid
+from dyno_msgs.srv import *
+
+import base64
+import numpy as np
+
+import zlib
+
+
+class GetMapServer:
+    def __init__(self):
+        rospy.init_node('get_map_server')
+
+        self.clear_all_service = rospy.Service(
+            '/get_map', GetMap, self.handle_get_map)
+
+    def handle_get_map(self, request):
+        response = GetMapResponse()
+        try:
+            map_msg = rospy.wait_for_message('/map', OccupancyGrid, 3)
+            response.info = map_msg.info
+
+            byte_array = np.asarray(map_msg.data, np.int8)
+            data_bytes = byte_array.tobytes()
+            response.data = zlib.compress(data_bytes).encode('base64')
+
+            # data_bytes = stream.bytes
+            # data_bytes = bytes(list(map_msg.data))
+            # rospy.logerr(data_bytes)
+            # rospy.logerr(bytes(map_msg.data, 'int'))
+            # response.data = base64.b64encode(data_bytes)
+            rospy.logerr(len(response.data))
+            response.success = True
+        except rospy.ROSException as e:
+            response.success = False
+            rospy.logwarn('map is not available')
+
+        return response
+
+
+if __name__ == '__main__':
+    try:
+        map_server = GetMapServer()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

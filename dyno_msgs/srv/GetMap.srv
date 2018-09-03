@@ -1,0 +1,5 @@
+---
+std_msgs/Header header
+nav_msgs/MapMetaData info
+string data
+bool success

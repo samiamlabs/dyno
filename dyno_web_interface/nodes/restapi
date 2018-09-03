@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+#
+
+import rospy
+import threading
+from nav_msgs.msg import OccupancyGrid
+from dyno_msgs.srv import *
+
+from flask import Flask
+from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
+
+from rospy_message_converter import json_message_converter
+
+map_msg = None
+
+
+def get_map():
+    service_name = '/get_map'
+    rospy.wait_for_service(service_name)
+    try:
+        return rospy.ServiceProxy(service_name, GetMap)().map
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
+        return OccupancyGrid()
+
+
+class Map(Resource):
+
+    def get(self):
+        try:
+            # global map_msg, lock
+            # FIXME: lock
+            # map_msg = OccupancyGrid()
+            map_msg = get_map()
+            map_json = json_message_converter.convert_ros_message_to_json(map_msg)
+            return map_json, 200
+
+        except rospy.ROSException as e:
+            return "Map is not found", 404
+            rospy.logwarn('map is not available')
+
+    def post(self):
+        pass
+
+    def put(self):
+        pass
+
+    def delete(self):
+        pass
+
+
+def map_callback(msg):
+    global map_msg, lock
+    # FIXME: lock
+    map_msg = msg
+
+
+if __name__ == '__main__':
+    try:
+        threading.Thread(target=lambda: rospy.init_node('rest_api', disable_signals=True)).start()
+        app = Flask(__name__)
+        CORS(app)
+        api = Api(app)
+        api.add_resource(Map, "/map")
+        app.run(host='localhost')
+    except rospy.ROSInterruptException:
+        pass

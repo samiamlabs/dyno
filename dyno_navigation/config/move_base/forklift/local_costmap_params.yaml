@@ -18,9 +18,6 @@ local_costmap:
   - {name: inflation_layer,         type: "costmap_2d::InflationLayer"}
   static_layer:
     lethal_cost_threshold: 60
-  # obstacle_layer:
-  #   observation_sources: scan
-  #   scan: {sensor_frame: base_scan_link, data_type: LaserScan, topic: scan, marking: true, clearing: true}
   inflation_layer:
     cost_scaling_factor: 4.0
     inflation_radius: 0.1

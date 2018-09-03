@@ -3,18 +3,46 @@
 import rospy
 from sensor_msgs.msg import LaserScan
 
+from copy import deepcopy
+
 pub = rospy.Publisher('/scan', LaserScan, queue_size=10)
+obstacle_pub = rospy.Publisher('/obstacle_scan', LaserScan, queue_size=10)
+
+scan_msg = None
+obstacle_scan_msg = None
 
 
 def callback(msg):
-    msg.header.stamp = rospy.Time.now()
-    pub.publish(msg)
+    global scan_msg
+    scan_msg = msg
+
+
+def obstacle_callback(msg):
+    global obstacle_scan_msg
+    obstacle_scan_msg = msg
 
 
 def scan_time_fixer():
     rospy.init_node('scan_time_fixer')
     rospy.Subscriber("/unity_scan", LaserScan, callback)
-    rospy.spin()
+    rospy.Subscriber("/unity_obstacle_scan", LaserScan, obstacle_callback)
+
+    global scan_msg
+    global obstacle_scan_msg
+
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        if scan_msg is not None:
+            msg = deepcopy(scan_msg)
+            msg.header.stamp = rospy.Time.now()
+            pub.publish(msg)
+
+        if obstacle_scan_msg is not None:
+            msg = deepcopy(obstacle_scan_msg)
+            msg.header.stamp = rospy.Time.now()
+            obstacle_pub.publish(msg)
+
+        rate.sleep()
 
 if __name__ == '__main__':
     try:

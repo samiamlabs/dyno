@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+import rospy
+
+import tf
+import tf_conversions.posemath as pm
+
+from nav_msgs.msg import Odometry
+
+pub = rospy.Publisher('/odom', Odometry, queue_size=10)
+
+odom_msg = None
+
+
+def callback(msg):
+    global odom_msg
+    odom_msg = msg
+
+
+def odom_time_fixer():
+    rospy.init_node('odom_time_fixer')
+    rospy.Subscriber("/unity_odom", Odometry, callback)
+
+    global odom_msg
+
+    transform_broadcaster = tf.TransformBroadcaster()
+
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        if odom_msg is not None:
+            odom_msg.header.stamp = rospy.Time.now()
+            pub.publish(odom_msg)
+
+            parent_frame_id = 'odom'
+            child_frame_id = 'base_footprint'
+
+            # odom_time = odom_msg.header.stamp
+            odom_time = rospy.Time.now()
+
+            # Post date to prevent lookup errors in TEB and similar stuff
+            # if odom_time.to_sec() > 0.1:
+            odom_time -= rospy.Duration.from_sec(0.1)
+
+            (odom_translation, odom_rotation) = pm.toTf(pm.fromMsg(odom_msg.pose.pose))
+
+            transform_broadcaster.sendTransform(odom_translation,
+                                                     odom_rotation,
+                                                     odom_time,
+                                                     child_frame_id,
+                                                     parent_frame_id)
+
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        odom_time_fixer()
+    except rospy.ROSInterruptException:
+        pass

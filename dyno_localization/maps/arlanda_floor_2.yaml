@@ -1,0 +1,6 @@
+image: arlanda_floor_2.pgm
+resolution: 0.050000
+origin: [-95.507739, -211.098877, 0.000000]
+negate: 0
+occupied_thresh: 0.1
+free_thresh: 0.01

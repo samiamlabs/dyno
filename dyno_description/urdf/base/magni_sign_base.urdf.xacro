@@ -64,7 +64,7 @@
         <geometry>
           <mesh filename="package://dyno_description/meshes/other/sign_pole.stl" scale="0.01 0.01 0.01"/>
         </geometry>
-        <material name="black"/>
+        <material name="grey"/>
       </visual>
     </link>
 
@@ -92,6 +92,7 @@
     </joint>
 
     <!-- Macros -->
+
     <drive_wheel name="wheel_right" radius="${wheel_radius}" width="${wheel_width}" separation="${wheel_separation}" reflect="1.0" parent="base_link"/>
     <drive_wheel name="wheel_left" radius="${wheel_radius}" width="${wheel_width}" separation="${wheel_separation}" reflect="-1.0" parent="base_link"/>
 

@@ -19,6 +19,7 @@
       <arg name="robot_name" value="$(arg robot_name)"/>
       <arg name="zeroconf" value="$(arg zeroconf)"/>
       <arg name="rosbridge_port" value="$(arg rosbridge_port)"/>
+      <arg name="capabilities_parameters" value="$(find dyno_bringup)/param/$(arg base)_capability_providers.yaml" />
     </include>
   </group>
 

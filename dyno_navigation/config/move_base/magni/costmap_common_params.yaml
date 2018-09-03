@@ -8,5 +8,8 @@ inflation_radius: 1.0
 cost_scaling_factor: 3.0
 
 map_type: costmap
-observation_sources: scan
-scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+
+obstacle_layer:
+  observation_sources: scan obstacle_scan
+  scan: {sensor_frame: base_scan_link, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+  obstacle_scan: {sensor_frame: obstacle_scan_link, data_type: LaserScan, topic: obstacle_scan, marking: true, clearing: true}

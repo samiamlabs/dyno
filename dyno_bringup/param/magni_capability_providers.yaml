@@ -1,0 +1,8 @@
+# default providers
+defaults:
+  'dyno_capabilities/MobileBase': 'dyno_capabilities/mobile_base'
+  'dyno_capabilities/RobotStatePublisher':    'dyno_capabilities/robot_state_publisher'
+  'dyno_capabilities/Navigation':           'dyno_capabilities/navigation'
+  'dyno_capabilities/Localization':           'dyno_capabilities/vive_tracker'
+  'dyno_capabilities/Diagnostics':            'dyno_capabilities/diagnostics'
+  'dyno_capabilities/WorldState':             'dyno_capabilities/world_state'

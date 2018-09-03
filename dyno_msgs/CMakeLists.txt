@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   geometry_msgs
+  nav_msgs
   actionlib_msgs
 )
 
@@ -34,6 +35,7 @@ add_service_files(
     AddCurrentLocation.srv
     AddObjectOnRobot.srv
     GetLocations.srv
+    GetMap.srv
     GetObjects.srv
     GetObjectsAtLocations.srv
     GetObjectsOnRobots.srv
@@ -60,6 +62,7 @@ generate_messages(
     std_msgs
     geometry_msgs
     actionlib_msgs
+    nav_msgs
 )
 
 catkin_package()

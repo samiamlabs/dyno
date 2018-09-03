@@ -1,0 +1,3 @@
+<launch>
+  <node name="restapi" pkg="dyno_web_interface" type="restapi"/>
+</launch>

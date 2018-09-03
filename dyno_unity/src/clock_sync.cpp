@@ -19,7 +19,8 @@ bool sync_updated_;
 
 void clockSyncCallback(const rosgraph_msgs::Clock &clock_msg) {
   SyncMessage sync_struct;
-  sync_struct.simulation_time = clock_msg.clock;
+  // Delay for cartograper
+  sync_struct.simulation_time = clock_msg.clock - ros::Duration(0.1);
   sync_message_.writeFromNonRT(sync_struct);
 
   //TODO: compensate for time until read in realtime thread
@@ -34,8 +35,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "unity_clock_sync");
   ros::NodeHandle nh;
 
-  // This should be set in launch files
-  // as well
+  // This should be set in launch files as well
   nh.setParam("/use_sim_time", true);
 
   SyncMessage sync_struct;
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
   while(ros::ok())
   {
 
-    usleep(dt.toSec() * 1e6);
+    usleep(dt.toSec() * 1e7);
 
     rosgraph_msgs::Clock clock;
     clock.clock = ros::Time(internal_time);

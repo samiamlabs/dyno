@@ -26,6 +26,9 @@ include_directories(
 add_executable(forklift src/forklift.cpp)
 target_link_libraries(forklift ${catkin_LIBRARIES})
 
+add_executable(diff_drive src/diff_drive.cpp)
+target_link_libraries(diff_drive ${catkin_LIBRARIES})
+
 add_executable(clock_sync src/clock_sync.cpp)
 target_link_libraries(clock_sync ${catkin_LIBRARIES})
 

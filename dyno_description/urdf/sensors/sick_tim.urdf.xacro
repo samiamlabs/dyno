@@ -25,11 +25,11 @@
 
     <joint name="${name}_joint" type="fixed">
       <parent link="${name}_mount_link" />
-      <child link="${name}" />
+      <child link="${name}_link" />
       <origin rpy="0 0 0" xyz="0 0 ${z_offset}"/>
     </joint>
 
-    <link name="${name}">
+    <link name="${name}_link">
       <visual>
         <geometry>
           <mesh filename="${mesh}" />

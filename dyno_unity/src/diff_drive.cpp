@@ -1,0 +1,69 @@
+/*
+License: BSD
+https://raw.githubusercontent.com/samiamlabs/dyno/master/LICENCE
+*/
+
+#include <ros/ros.h>
+#include <rosgraph_msgs/Clock.h>
+
+#include <controller_manager/controller_manager.h>
+#include "diff_drive.h"
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "diff_drive_unity_interface");
+  ros::NodeHandle nh;
+
+  // This should be set in launch files as well
+  // nh.setParam("/use_sim_time", true);
+
+  DiffDrive robot;
+  ROS_WARN_STREAM("period: " << robot.getPeriod().toSec());
+  controller_manager::ControllerManager cm(&robot, nh);
+
+  ros::Publisher clock_publisher = nh.advertise<rosgraph_msgs::Clock>("/clock", 1);
+
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
+
+  boost::chrono::system_clock::time_point begin = boost::chrono::system_clock::now();
+  boost::chrono::system_clock::time_point end   = boost::chrono::system_clock::now();
+
+  ros::Time internal_time(0);
+  const ros::Duration dt = robot.getPeriod();
+  double elapsed_secs = 0;
+
+  while(ros::ok())
+  {
+    begin = boost::chrono::system_clock::now();
+
+    robot.read();
+    // cm.update(internal_time, dt);
+    cm.update(robot.getTime(), robot.getPeriod());
+    robot.write();
+
+    end = boost::chrono::system_clock::now();
+
+    elapsed_secs = boost::chrono::duration_cast<boost::chrono::duration<double> >((end - begin)).count();
+
+    if (dt.toSec() - elapsed_secs < 0.0)
+    {
+      ROS_WARN_STREAM_THROTTLE(
+            0.1, "Control cycle is taking to much time, elapsed: " << elapsed_secs);
+    }
+    else
+    {
+      // ROS_DEBUG_STREAM_THROTTLE(1.0, "Control cycle is, elapsed: " << elapsed_secs);
+      usleep((dt.toSec() - elapsed_secs) * 1e6);
+    }
+
+    // rosgraph_msgs::Clock clock;
+    // clock.clock = ros::Time(internal_time);
+    // clock_publisher.publish(clock);
+
+    internal_time += dt;
+  }
+  spinner.stop();
+
+  return 0;
+}

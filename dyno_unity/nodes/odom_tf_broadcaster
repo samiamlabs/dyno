@@ -24,7 +24,8 @@ class OdomBroadcaster:
         parent_frame_id = 'odom'
         child_frame_id = 'base_footprint'
 
-        odom_time = odometry_msg.header.stamp
+        # odom_time = odometry_msg.header.stamp
+        odom_time = rospy.Time.now()
 
         # Post date to prevent lookup errors in TEB and similar stuff
         if odom_time.to_sec() > 0.1:

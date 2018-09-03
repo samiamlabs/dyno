@@ -138,4 +138,6 @@
     <arg name="port" value="$(arg rosbridge_port)"/>
   </include>
 
+  <include file="$(find dyno_web_interface)/launch/utils.launch"/>
+
 </launch>

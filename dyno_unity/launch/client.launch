@@ -1,5 +1,5 @@
 <launch>
-  <arg name="use_sim_time" default="true"/>
+  <arg name="use_sim_time" default="false"/>
 
   <arg name="robot_name" default="dyno_client"/>
   <arg name="zeroconf" default="false"/>
@@ -23,6 +23,8 @@
   <group if="$(eval base == 'forklift')">
     <!-- Driver/intreface and simulation time -->
     <node name="forklift_unity_hardware_interface" pkg="dyno_unity" type="forklift" output="screen"/>
+
+    <node name="laser_scan_time_fixer" pkg="dyno_unity" type="laser_scan_time_fixer"/>
   </group>
 
   <group if="$(eval base == 'quadrotor')">
@@ -34,6 +36,20 @@
     <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster"  args="0 0 0 0 0 0 base_footprint base_link 20"/>
 
     <node name="odom_broadcaster" pkg="dyno_unity" type="odom_tf_broadcaster"/>
+
+  </group>
+
+  <group if="$(eval base == 'magni')">
+    <!-- Time sync -->
+    <node name="utity_clock" pkg="dyno_unity" type="clock"/>
+
+    <include file="$(find dyno_unity)/launch/diff_drive.launch"/>
+
+    <!--
+    <node name="laser_scan_time_fixer" pkg="dyno_unity" type="laser_scan_time_fixer"/>
+    <node name="odom_time_fixer" pkg="dyno_unity" type="odom_time_fixer"/>
+    <node name="odom_broadcaster" pkg="dyno_unity" type="odom_tf_broadcaster"/>
+     -->
 
   </group>
 
