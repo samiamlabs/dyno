@@ -31,7 +31,6 @@ catkin_make
 
 ## Add catkin_ws setup.bash to .bashrc
 ```
-source ~/cartographer_ws/devel_isolated/setup.bash >> ~/.bashrc
 source ~/.bashrc
 ```
 
