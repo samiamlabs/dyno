@@ -13,8 +13,11 @@
   <depend>roscpp</depend>
   <depend>mongodb_store</depend>
   <depend>tf2_bullet</depend>
-  <depend>freeglut3_dev</depend>
   <depend>rosplan_planning_system</depend>
+
+  <!--
+  <depend>freeglut3-dev</depend>
+  -->
 
   <export>
   </export>
